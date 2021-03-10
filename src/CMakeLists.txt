@@ -1,5 +1,5 @@
 set(SOURCE_FILES
-    "nodesLib/addFloat.cpp"
+    "nodesLib/ldAddFloat.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)

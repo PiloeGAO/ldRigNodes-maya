@@ -17,7 +17,7 @@
 #include "pluginMain.h"
 
 /* Custom Nodes */
-#include "nodesLib/addFloat.h"
+#include "nodesLib/ldAddFloat.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -33,7 +33,7 @@ MStatus initializePlugin(MObject obj)
     MStatus status;
     MFnPlugin plugin(obj, PLUGIN_COMPANY, "0.1", "Any");
 
-    status = plugin.registerNode("addFloat", AddFloat::id, &AddFloat::creator, &AddFloat::initialize);
+    status = plugin.registerNode("ldAddFloat", AddFloat::id, &AddFloat::creator, &AddFloat::initialize);
 
     if(!status)
     {
