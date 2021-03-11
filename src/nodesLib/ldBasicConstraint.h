@@ -1,11 +1,11 @@
-#ifndef ADD_FLOAT
-#define ADD_FLOAT
+#ifndef BASIC_CONSTRAINT
+#define BASIC_CONSTRAINT
 
 #include <maya/MPxNode.h>
 
 #include <maya/MTypeId.h>
 
-class AddFloat : public MPxNode
+class BasicConstraint : public MPxNode
 {
 public:
     MStatus compute(const MPlug& plug, MDataBlock& data) override;
@@ -16,9 +16,8 @@ public:
 public:
     static MTypeId id;
 
-    static MObject inFloatA;
-    static MObject inFloatB;
-    static MObject outResult;
+    static MObject inTransform;
+    static MObject outTransform;
 };
 
 #endif

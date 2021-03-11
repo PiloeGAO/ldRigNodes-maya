@@ -1,5 +1,6 @@
 set(SOURCE_FILES
     "nodesLib/ldAddFloat.cpp"
+    "nodesLib/ldBasicConstraint.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)

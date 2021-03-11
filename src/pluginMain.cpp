@@ -18,6 +18,7 @@
 
 /* Custom Nodes */
 #include "nodesLib/ldAddFloat.h"
+#include "nodesLib/ldBasicConstraint.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -33,13 +34,12 @@ MStatus initializePlugin(MObject obj)
     MStatus status;
     MFnPlugin plugin(obj, PLUGIN_COMPANY, "0.1", "Any");
 
+    /* Loading Nodes. */
     status = plugin.registerNode("ldAddFloat", AddFloat::id, &AddFloat::creator, &AddFloat::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
 
-    if(!status)
-    {
-        status.perror("registerNode");
-        return status;
-    }
+    status = plugin.registerNode("ldBasicConstraint", BasicConstraint::id, &BasicConstraint::creator, &BasicConstraint::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
 
     return status;
 }
@@ -55,13 +55,12 @@ MStatus uninitializePlugin(MObject obj)
     MStatus status;
     MFnPlugin plugin(obj);
 
-    status = plugin.deregisterNode((MTypeId) 0x08000);
-
-    if(!status)
-    {
-        status.perror("deregisterNode");
-        return status;
-    }
+    /* Unloading Nodes. */
+    status = plugin.deregisterNode(AddFloat::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+    
+    status = plugin.deregisterNode(BasicConstraint::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
 }
