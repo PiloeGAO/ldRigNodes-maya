@@ -1,4 +1,5 @@
 set(SOURCE_FILES
+    "nodesLib/ldBaseRigNode.cpp"
     "nodesLib/ldAddFloat.cpp"
     "nodesLib/ldBasicConstraint.cpp"
     "pluginMain.cpp")

@@ -8,7 +8,6 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#include <maya/MPxNode.h>
 
 #include <maya/MFnNumericAttribute.h>
 
@@ -17,6 +16,7 @@
 #include <maya/MPlug.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
+#include <maya/MObject.h>
 
 #include "ldAddFloat.h"
 
@@ -82,37 +82,19 @@ MStatus AddFloat::initialize()
     MFnNumericAttribute numAttribFn;
     MStatus stat;
 
-    inFloatA = numAttribFn.create("FloatA", "fltA", MFnNumericData::kFloat, 0.0);
-    numAttribFn.setStorable(true);
-    numAttribFn.setKeyable(true);
-    numAttribFn.setHidden(false);
-    numAttribFn.setWritable(true);
+    inFloatA = addInputFloatAttribute(stat, MString("FloatA"), MString("fltA"), 0.0);
+    if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    stat = addAttribute(inFloatA);
+    inFloatB = addInputFloatAttribute(stat, MString("FloatB"), MString("fltB"), 0.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
-    inFloatB = numAttribFn.create("FloatB", "fltB", MFnNumericData::kFloat, 0.0);
-    numAttribFn.setStorable(true);
-    numAttribFn.setKeyable(true);
-    numAttribFn.setHidden(false);
-    numAttribFn.setWritable(true);
-
-    stat = addAttribute(inFloatB);
+    outResult = addOuputFloatAttribute(stat, MString("result"), MString("rslt"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
+    
+    MObject inputs[2] = {inFloatA, inFloatB};
+    MObject outputs[1] = {outResult};
 
-    outResult = numAttribFn.create("result", "rslt", MFnNumericData::kFloat, 0.0);
-    numAttribFn.setWritable(false);
-    numAttribFn.setStorable(false);
-    numAttribFn.setHidden(false);
-    numAttribFn.setReadable(true);
-
-    stat = addAttribute(outResult);
-    if(!stat) {stat.perror("addAttribute"); return stat;}
-
-    stat = attributeAffects( inFloatA, outResult);
-    if(!stat) {stat.perror("attributeAffects"); return stat;}
-    stat = attributeAffects( inFloatB, outResult);
-    if(!stat) {stat.perror("attributeAffects"); return stat;}
+    setAttributeDepencies(inputs, 2, outputs, 1);
 
     return MS::kSuccess;
 }

@@ -2,10 +2,11 @@
 #define ADD_FLOAT
 
 #include <maya/MPxNode.h>
+#include "ldBaseRigNode.h"
 
 #include <maya/MTypeId.h>
 
-class AddFloat : public MPxNode
+class AddFloat : public BaseRigNode
 {
 public:
     MStatus compute(const MPlug& plug, MDataBlock& data) override;
