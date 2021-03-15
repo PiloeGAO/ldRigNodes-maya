@@ -15,6 +15,7 @@
 #include <maya/MString.h>
 #include <maya/MStatus.h>
 #include <maya/MObject.h>
+#include <maya/MTransformationMatrix.h>
 
 #include "ldBaseRigNode.h"
 
@@ -159,6 +160,18 @@ MObject BaseRigNode::addOuputMatrixAttribute(MStatus &status, MString longName, 
     status = addAttribute(attrib);
 
     return attrib;
+}
+
+void BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject input, MTransformationMatrix &output)
+{
+    MStatus status;
+
+    MDataHandle inTransformHandle = dataBlock.inputValue(input, &status);
+    
+    if(status != MS::kSuccess)
+    { cerr << "ERROR getting data" << endl; }
+    else
+    { output = inTransformHandle.asMatrix(); }
 }
 
 void BaseRigNode::setAttributeDepencies(MObject inputs[], int inputLength, MObject outputs[], int ouputLength){

@@ -42,9 +42,8 @@ MStatus BasicConstraint::compute(const MPlug& plug, MDataBlock& data)
     
     if(plug == outTransform)
     {
-        MDataHandle inTransformHandle = data.inputValue(inTransform, &returnStatus);
-        if(returnStatus != MS::kSuccess){cerr << "ERROR getting data" << endl;}
-        MTransformationMatrix transform = inTransformHandle.asMatrix();
+        MTransformationMatrix transform;
+        getMatrix(data, inTransform, transform);
 
         /* Spliting the components */
         MVector position = transform.getTranslation(MSpace::kWorld);

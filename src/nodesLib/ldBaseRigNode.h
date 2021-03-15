@@ -21,7 +21,7 @@ public:
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
     static void getFloat(MDataBlock &dataBlock, MObject input, float &output);
-    
+
     // Add IO Matrix.
     static MObject addInputMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
@@ -29,6 +29,8 @@ public:
     static MObject addOuputMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
 
+    static void getMatrix(MDataBlock &dataBlock, MObject input, MTransformationMatrix &output);
+    
     // Set Depencies.
     static void setAttributeDepencies(MObject inputs[], int inputLength, MObject outputs[], int ouputLength);
 };
