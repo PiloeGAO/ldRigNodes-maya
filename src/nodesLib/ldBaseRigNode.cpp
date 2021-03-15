@@ -86,6 +86,24 @@ MObject BaseRigNode::addOuputFloatAttribute(MStatus &status, MString longName, M
 }
 
 /**
+ * @brief Get float stored in a MObject.
+ * 
+ * @param dataBlock MDataBlock  The data block of the node.
+ * @param input     MObject     The float input.
+ * @param output    float       The float value.
+ */
+void BaseRigNode::getFloat(MDataBlock &dataBlock, MObject input, float &output)
+{
+    MStatus status;
+    MDataHandle inFloatHandle = dataBlock.inputValue(input, &status);
+
+    if(status != MS::kSuccess)
+    { cerr << "ERROR getting float data" << endl; }
+    else
+    { output = inFloatHandle.asFloat(); }
+}
+
+/**
  * @brief Add a matrix input attribute.
  * 
  * @param status    MStatus The status of the creation.

@@ -39,21 +39,17 @@ MStatus AddFloat::compute(const MPlug& plug, MDataBlock& data)
 
     if(plug == outResult)
     {
-        MDataHandle inFloatAHandle = data.inputValue(inFloatA, &returnStatus);
-        MDataHandle inFloatBHandle = data.inputValue(inFloatB, &returnStatus);
+        float floatA;
+        getFloat(data, inFloatA, floatA);
 
-        if(returnStatus != MS::kSuccess)
-        {
-            cerr << "ERROR getting data" << endl;
-        }
-        else
-        {        
-            float result = inFloatAHandle.asFloat() + inFloatBHandle.asFloat();
+        float floatB;
+        getFloat(data, inFloatB, floatB);
 
-            MDataHandle outResultHandle = data.outputValue(outResult);
-            outResultHandle.set(result);
-            data.setClean(plug);
-        }
+        float result = floatA + floatB;
+
+        MDataHandle outResultHandle = data.outputValue(outResult);
+        outResultHandle.set(result);
+        data.setClean(plug);
 
     } else {
         return MS::kUnknownParameter;
