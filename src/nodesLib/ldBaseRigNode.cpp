@@ -10,6 +10,7 @@
  */
 
 #include <maya/MFnNumericAttribute.h>
+#include <maya/MFnMatrixAttribute.h>
 
 #include <maya/MString.h>
 #include <maya/MStatus.h>
@@ -78,6 +79,64 @@ MObject BaseRigNode::addOuputFloatAttribute(MStatus &status, MString longName, M
     numAttribFn.setStorable(storable);
     numAttribFn.setReadable(readable);
     numAttribFn.setHidden(hidden);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Add a matrix input attribute.
+ * 
+ * @param status    MStatus The status of the creation.
+ * @param longName  MString The long name.
+ * @param shortName MString The short name.
+ * @param writable  bool    Allow the attribute to be writable.
+ * @param storable  bool    Allow the attribute to be storable.
+ * @param keyable   bool    Allow the attribute to be keyable.
+ * @param hidden    bool    Allow the attribute to be hidden.
+ * @return          MObject The attribute. 
+ */
+MObject BaseRigNode::addInputMatrixAttribute(MStatus &status, MString longName, MString shortName,
+                                bool writable, bool storable, bool keyable, bool hidden)
+{
+    MFnMatrixAttribute matAttribFn;
+
+    MObject attrib = matAttribFn.create(longName, shortName);
+
+    matAttribFn.setWritable(writable);
+    matAttribFn.setStorable(storable);
+    matAttribFn.setKeyable(keyable);
+    matAttribFn.setHidden(hidden);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Add a matrix output attribute.
+ * 
+ * @param status    MStatus The status of the creation.
+ * @param longName  MString The long name.
+ * @param shortName MString The short name.
+ * @param writable  bool    Allow the attribute to be writable.
+ * @param storable  bool    Allow the attribute to be storable.
+ * @param readable  bool    Allow the attribute to be readable.
+ * @param hidden    bool    Allow the attribute to be hidden.
+ * @return          MObject The attribute.
+ */
+MObject BaseRigNode::addOuputMatrixAttribute(MStatus &status, MString longName, MString shortName,
+                                            bool writable, bool storable, bool readable, bool hidden)
+{
+    MFnMatrixAttribute matAttribFn;
+
+    MObject attrib = matAttribFn.create(longName, shortName);
+
+    matAttribFn.setWritable(writable);
+    matAttribFn.setStorable(storable);
+    matAttribFn.setReadable(readable);
+    matAttribFn.setHidden(hidden);
 
     status = addAttribute(attrib);
 

@@ -91,26 +91,16 @@ MStatus BasicConstraint::initialize()
     MFnMatrixAttribute matAttribFn;
     MStatus stat;
 
-    inTransform = matAttribFn.create("inTransform", "inTrans");
-    matAttribFn.setStorable(true);
-    matAttribFn.setKeyable(true);
-    matAttribFn.setHidden(false);
-    matAttribFn.setWritable(true);
-
-    stat = addAttribute(inTransform);
+    inTransform = addInputMatrixAttribute(stat, MString("inTranform"), MString("inTrans"));
+    if(!stat) {stat.perror("addAttribute"); return stat;}
+    
+    outTransform = addOuputMatrixAttribute(stat, MString("outTranform"), MString("outTrans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    outTransform = matAttribFn.create("outTransform", "outTrans");
-    matAttribFn.setWritable(false);
-    matAttribFn.setStorable(false);
-    matAttribFn.setHidden(false);
-    matAttribFn.setReadable(true);
+    MObject inputs[1] = {inTransform};
+    MObject outputs[1] = {outTransform};
 
-    stat = addAttribute(outTransform);
-    if(!stat) {stat.perror("addAttribute"); return stat;}
-
-    stat = attributeAffects( inTransform, outTransform);
-    if(!stat) {stat.perror("attributeAffects"); return stat;}
+    setAttributeDepencies(inputs, 1, outputs, 1);
 
     return MS::kSuccess;
 }

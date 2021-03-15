@@ -5,7 +5,9 @@
 
 #include <maya/MTypeId.h>
 
-class BasicConstraint : public MPxNode
+#include "ldBaseRigNode.h"
+
+class BasicConstraint : public BaseRigNode
 {
 public:
     MStatus compute(const MPlug& plug, MDataBlock& data) override;
