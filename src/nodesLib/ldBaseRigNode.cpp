@@ -162,6 +162,13 @@ MObject BaseRigNode::addOuputMatrixAttribute(MStatus &status, MString longName, 
     return attrib;
 }
 
+/**
+ * @brief Get the transformation matrix stored in a MObject.
+ * 
+ * @param dataBlock MDataBlock The
+ * @param input 
+ * @param output 
+ */
 void BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject input, MTransformationMatrix &output)
 {
     MStatus status;
@@ -174,6 +181,14 @@ void BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject input, MTransformatio
     { output = inTransformHandle.asMatrix(); }
 }
 
+/**
+ * @brief Set attribute depencies.
+ * 
+ * @param inputs        MObject Inputs list.
+ * @param inputLength   int     Number of inputs.
+ * @param outputs       MObject Outputs list.
+ * @param ouputLength   int     Number of outputs.
+ */
 void BaseRigNode::setAttributeDepencies(MObject inputs[], int inputLength, MObject outputs[], int ouputLength){
     MStatus status;
 
