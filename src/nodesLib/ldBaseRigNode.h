@@ -65,8 +65,14 @@ public:
     static MObject addInputMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
+    static MObject addInputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
+                                            bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
+
     static MObject addOuputMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
+
+    static MObject addOuputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
+                                                bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
 
     static MTransformationMatrix getMatrix(MDataBlock &dataBlock, MObject input);
     
