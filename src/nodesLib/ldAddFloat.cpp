@@ -39,11 +39,9 @@ MStatus AddFloat::compute(const MPlug& plug, MDataBlock& data)
 
     if(plug == outResult)
     {
-        float floatA;
-        getFloat(data, inFloatA, floatA);
+        float floatA = getFloat(data, inFloatA);
 
-        float floatB;
-        getFloat(data, inFloatB, floatB);
+        float floatB = getFloat(data, inFloatB);
 
         float result = floatA + floatB;
 
