@@ -45,10 +45,16 @@ MStatus BasicConstraint::compute(const MPlug& plug, MDataBlock& data)
         MTransformationMatrix transform = getMatrix(data, inTransform);
 
         /* Spliting the components */
+        /*
         MVector position = transform.getTranslation(MSpace::kWorld);
         MQuaternion rotation = transform.rotation();
         double scale[3];
         transform.getScale(scale, MSpace::kWorld);
+        */
+        MVector position;
+        MQuaternion rotation;
+        double scale[3];
+        splitMTransformationMatrix(transform, position, rotation, scale);
 
         /* Building the result matrix from each components. */
         MTransformationMatrix resultTrans;
