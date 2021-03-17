@@ -19,9 +19,11 @@
 /* Custom Nodes */
 #include "nodesLib/ldAddFloat.h"
 #include "nodesLib/ldBasicConstraint.h"
+#include "nodesLib/ldRigCurveNode.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
+#define PLUGIN_VERSION "0.1"
 
 /**
  * @brief Load the plugin in Maya.
@@ -32,13 +34,16 @@
 MStatus initializePlugin(MObject obj)
 {
     MStatus status;
-    MFnPlugin plugin(obj, PLUGIN_COMPANY, "0.1", "Any");
+    MFnPlugin plugin(obj, PLUGIN_COMPANY, PLUGIN_VERSION, "Any");
 
     /* Loading Nodes. */
     status = plugin.registerNode("ldAddFloat", AddFloat::id, &AddFloat::creator, &AddFloat::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
     status = plugin.registerNode("ldBasicConstraint", BasicConstraint::id, &BasicConstraint::creator, &BasicConstraint::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
+    
+    status = plugin.registerNode("ldRigCurveNode", RigCurveNode::id, &RigCurveNode::creator, &RigCurveNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
     return status;
@@ -60,6 +65,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
     
     status = plugin.deregisterNode(BasicConstraint::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+    
+    status = plugin.deregisterNode(RigCurveNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
