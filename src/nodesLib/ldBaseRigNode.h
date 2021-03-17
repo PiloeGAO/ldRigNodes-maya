@@ -6,13 +6,14 @@
 #include <maya/MString.h>
 #include <maya/MStatus.h>
 #include <maya/MObject.h>
+#include <maya/MVector.h>
 
 using namespace std;
 
 class BaseRigNode : public MPxNode
 {
 public:
-    // Add IO Tnt.
+    // Add IO Int.
     static MObject addInputIntAttribute(MStatus &status, MString longName, MString shortName, int defaultValue,
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
 
@@ -23,6 +24,16 @@ public:
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
     static int getInt(MDataBlock &dataBlock, MObject input);
+
+    // Add IO Vectors.
+    static MObject addInputVectorAttribute(MStatus &status, MString longName, MString shortName,
+                                            double defaultValue, double minValue = -numeric_limits<double>::max(), double maxValue = numeric_limits<double>::max(),
+                                            bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
+    
+    static MObject addOuputVectorAttribute(MStatus &status, MString longName, MString shortName,
+                                            bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
+    
+    static MVector getVector(MDataBlock &dataBlock, MObject input);
 
     // Add IO Float.
     static MObject addInputFloatAttribute(MStatus &status, MString longName, MString shortName,

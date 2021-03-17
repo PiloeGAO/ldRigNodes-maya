@@ -17,6 +17,7 @@
 #include <maya/MObject.h>
 #include <maya/MTransformationMatrix.h>
 #include <maya/MMatrix.h>
+#include <maya/MVector.h>
 
 #include "ldBaseRigNode.h"
 
@@ -128,6 +129,90 @@ int BaseRigNode::getInt(MDataBlock &dataBlock, MObject input)
     { return inIntHandle.asInt(); }
 }
 
+//***********************************************************************************//
+/**
+ * @brief Add a vector input attribute.
+ * 
+ * @param status        MStatus The status of the creation.
+ * @param longName      char    Long name.
+ * @param shortName     char    Short name.
+ * @param defaultValue  double  Default value.
+ * @param minValue      double  Min value.
+ * @param maxValue      double  Max value.
+ * @param writable      bool    Allow the attribute to be writable.
+ * @param storable      bool    Allow the attribute to be storable.
+ * @param keyable       bool    Allow the attribute to be keyable.
+ * @param hidden        bool    Allow the attribute to be hidden.
+ * @return              MObject The attribute.
+ */
+MObject BaseRigNode::addInputVectorAttribute(MStatus &status, MString longName, MString shortName,
+                                double defaultValue, double minValue, double maxValue,
+                                bool writable, bool storable, bool keyable, bool hidden)
+{
+    MFnNumericAttribute numAttribFn;
+
+    MObject attrib = numAttribFn.create(longName, shortName, MFnNumericData::k3Float, defaultValue);
+
+    numAttribFn.setWritable(writable);
+    numAttribFn.setStorable(storable);
+    numAttribFn.setKeyable(keyable);
+    numAttribFn.setHidden(hidden);
+
+    if(minValue != -numeric_limits<double>::max()) {numAttribFn.setMin(minValue);}
+    if(maxValue != numeric_limits<double>::max()) {numAttribFn.setMax(maxValue);}
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Add a vector output attribute.
+ * 
+ * @param status    MStatus The status of the creation.
+ * @param longName  MString The long name.
+ * @param shortName MString The short name.
+ * @param writable  bool    Allow the attribute to be writable.
+ * @param storable  bool    Allow the attribute to be storable.
+ * @param readable  bool    Allow the attribute to be readable.
+ * @param hidden    bool    Allow the attribute to be hidden.
+ * @return          MObject The attribute.
+ */
+MObject BaseRigNode::addOuputVectorAttribute(MStatus &status, MString longName, MString shortName,
+                                bool writable, bool storable, bool readable, bool hidden)
+{
+    MFnNumericAttribute numAttribFn;
+
+    MObject attrib = numAttribFn.create(longName, shortName, MFnNumericData::k3Float);
+
+    numAttribFn.setWritable(writable);
+    numAttribFn.setStorable(storable);
+    numAttribFn.setReadable(readable);
+    numAttribFn.setHidden(hidden);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Get vector stored in a MObject.
+ * 
+ * @param dataBlock MDataBlock  The data block of the node.
+ * @param input     MObject     The vector input.
+ */
+MVector BaseRigNode::getVector(MDataBlock &dataBlock, MObject input)
+{
+    MStatus status;
+    MDataHandle inVectorHandle = dataBlock.inputValue(input, &status);
+
+    if(status != MS::kSuccess)
+    { cerr << "ERROR getting float data" << endl; return MVector(-numeric_limits<double>::max(), -numeric_limits<double>::max(),-numeric_limits<double>::max()); }
+    else
+    { return inVectorHandle.asVector(); }
+}
+
+//***********************************************************************************//
 /**
  * @brief Add a float input attribute.
  * 
@@ -210,6 +295,7 @@ float BaseRigNode::getFloat(MDataBlock &dataBlock, MObject input)
     { return inFloatHandle.asFloat(); }
 }
 
+//***********************************************************************************//
 /**
  * @brief Add a matrix input attribute.
  * 
@@ -287,6 +373,7 @@ MTransformationMatrix BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject inpu
     { return inTransformHandle.asMatrix(); }
 }
 
+//***********************************************************************************//
 /**
  * @brief Set attribute depencies.
  * 
