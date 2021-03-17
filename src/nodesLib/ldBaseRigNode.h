@@ -68,6 +68,11 @@ public:
 
     static MTransformationMatrix getMatrix(MDataBlock &dataBlock, MObject input);
     
+    // Utils.
+    static MVector getAxis(int axisAlign = 0);
+
+    static void splitMTransformationMatrix(MTransformationMatrix matrix, MVector &position, MQuaternion &angle, double (&scale)[3]);
+
     // Set Depencies.
     static void setAttributeDepencies(MObject inputs[], int inputLength, MObject outputs[], int ouputLength);
 };

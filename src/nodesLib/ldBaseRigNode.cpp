@@ -20,6 +20,7 @@
 #include <maya/MMatrix.h>
 #include <maya/MVector.h>
 #include <maya/MAngle.h>
+#include <maya/MQuaternion.h>
 
 #include "ldBaseRigNode.h"
 
@@ -491,6 +492,40 @@ MTransformationMatrix BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject inpu
     { cerr << "ERROR getting data" << endl; return MTransformationMatrix(); }
     else
     { return inTransformHandle.asMatrix(); }
+}
+
+
+//***********************************************************************************//
+/**
+ * @brief Get axis from an enum index.
+ * 
+ * @param axisAlign int Index.
+ * @return MVector Corresponding axis.
+ */
+MVector BaseRigNode::getAxis(int axisAlign)
+{
+    if(axisAlign == 1) { return MVector::yAxis; }
+    else if (axisAlign == 2) { return MVector::zAxis; }
+    else if (axisAlign == 3) { return MVector::xNegAxis; }
+    else if (axisAlign == 4) { return MVector::yNegAxis; }
+    else if (axisAlign == 5) { return MVector::zNegAxis; }
+
+    return MVector::xAxis;
+}
+
+/**
+ * @brief Splitting a MTransformationMatrix in position, rotation and scale.
+ * 
+ * @param matrix    MTransformationMatrix   The input matrix.
+ * @param position  MVector                 The position.
+ * @param rotation  MQuaternion             The rotation.
+ * @param scale     double[3]               The scale.
+ */
+void BaseRigNode::splitMTransformationMatrix(MTransformationMatrix matrix, MVector &position, MQuaternion &rotation, double (&scale)[3])
+{
+    position = matrix.getTranslation(MSpace::kWorld);
+    rotation = matrix.rotation();
+    matrix.getScale(scale, MSpace::kWorld);
 }
 
 //***********************************************************************************//
