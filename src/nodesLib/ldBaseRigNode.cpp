@@ -11,6 +11,7 @@
 
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnMatrixAttribute.h>
+#include <maya/MFnUnitAttribute.h>
 
 #include <maya/MString.h>
 #include <maya/MStatus.h>
@@ -18,6 +19,7 @@
 #include <maya/MTransformationMatrix.h>
 #include <maya/MMatrix.h>
 #include <maya/MVector.h>
+#include <maya/MAngle.h>
 
 #include "ldBaseRigNode.h"
 
@@ -211,6 +213,90 @@ MVector BaseRigNode::getVector(MDataBlock &dataBlock, MObject input)
     else
     { return inVectorHandle.asVector(); }
 }
+
+//***********************************************************************************//
+/**
+ * @brief Add angle input attribute.
+ * 
+ * @param status        MStatus The status of the creation.
+ * @param longName      char    Long name.
+ * @param shortName     char    Short name.
+ * @param defaultValue  double  Default value.
+ * @param minValue      double  Min value.
+ * @param maxValue      double  Max value.
+ * @param writable      bool    Allow the attribute to be writable.
+ * @param storable      bool    Allow the attribute to be storable.
+ * @param keyable       bool    Allow the attribute to be keyable.
+ * @param hidden        bool    Allow the attribute to be hidden.
+ * @return              MObject The attribute.
+ */
+MObject BaseRigNode::addInputAngleAttribute(MStatus &status, MString longName, MString shortName,
+                                        double defaultValue, double minValue, double maxValue,
+                                        bool writable, bool storable, bool keyable, bool hidden)
+{
+    MFnUnitAttribute unitAttribFn;
+
+    MObject attrib = unitAttribFn.create(longName, shortName, MAngle(defaultValue, MAngle::kDegrees));
+
+    unitAttribFn.setWritable(writable);
+    unitAttribFn.setStorable(storable);
+    unitAttribFn.setKeyable(keyable);
+    unitAttribFn.setHidden(hidden);
+
+    if(minValue != -numeric_limits<double>::max()) {unitAttribFn.setMin(minValue);}
+    if(maxValue != numeric_limits<double>::max()) {unitAttribFn.setMax(maxValue);}
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Add angle output attribute.
+ * 
+ * @param status    MStatus The status of the creation.
+ * @param longName  MString The long name.
+ * @param shortName MString The short name.
+ * @param writable  bool    Allow the attribute to be writable.
+ * @param storable  bool    Allow the attribute to be storable.
+ * @param readable  bool    Allow the attribute to be readable.
+ * @param hidden    bool    Allow the attribute to be hidden.
+ * @return          MObject The attribute.
+ */
+MObject BaseRigNode::addOuputAngleAttribute(MStatus &status, MString longName, MString shortName,
+                                            bool writable, bool storable, bool readable, bool hidden)
+{
+    MFnUnitAttribute unitAttribFn;
+
+    MObject attrib = unitAttribFn.create(longName, shortName, MFnUnitAttribute::kAngle);
+
+    unitAttribFn.setWritable(writable);
+    unitAttribFn.setStorable(storable);
+    unitAttribFn.setReadable(readable);
+    unitAttribFn.setHidden(hidden);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Get angle stored in a MObject.
+ * 
+ * @param dataBlock MDataBlock  The data block of the node.
+ * @param input     MObject     The float input.
+ */
+MAngle BaseRigNode::getAngle(MDataBlock &dataBlock, MObject input)
+{
+    MStatus status;
+    MDataHandle inAngleHandle = dataBlock.inputValue(input, &status);
+
+    if(status != MS::kSuccess)
+    { cerr << "ERROR getting float data" << endl; return -numeric_limits<double>::max(); }
+    else
+    { return inAngleHandle.asAngle(); }
+}
+
 
 //***********************************************************************************//
 /**

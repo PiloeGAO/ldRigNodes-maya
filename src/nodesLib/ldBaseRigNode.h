@@ -35,6 +35,17 @@ public:
     
     static MVector getVector(MDataBlock &dataBlock, MObject input);
 
+    // Add IO Angle.
+    static MObject addInputAngleAttribute(MStatus &status, MString longName, MString shortName,
+                                            double defaultValue, double minValue = -numeric_limits<double>::max(), double maxValue = numeric_limits<double>::max(),
+                                            bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
+    
+    static MObject addOuputAngleAttribute(MStatus &status, MString longName, MString shortName,
+                                            bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
+    
+    static MAngle getAngle(MDataBlock &dataBlock, MObject input);
+
+
     // Add IO Float.
     static MObject addInputFloatAttribute(MStatus &status, MString longName, MString shortName,
                                             double defaultValue, double minValue = -numeric_limits<double>::max(), double maxValue = numeric_limits<double>::max(),
