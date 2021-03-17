@@ -18,7 +18,7 @@ public:
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
 
     static MObject addInputIntArrayAttribute(MStatus &status, MString longName, MString shortName,
-                                            bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
+                                                bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
     static MObject addOuputIntAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
@@ -39,6 +39,9 @@ public:
     static MObject addInputFloatAttribute(MStatus &status, MString longName, MString shortName,
                                             double defaultValue, double minValue = -numeric_limits<double>::max(), double maxValue = numeric_limits<double>::max(),
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
+
+    static MObject addInputFloatArrayAttribute(MStatus &status, MString longName, MString shortName, double defaultValue,
+                                                bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
     static MObject addOuputFloatAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);

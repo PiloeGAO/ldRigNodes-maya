@@ -250,6 +250,40 @@ MObject BaseRigNode::addInputFloatAttribute(MStatus &status, MString longName, M
 }
 
 /**
+ * @brief Add a float array input attribute.
+ * 
+ * @param status        MStatus The status of the creation.
+ * @param longName      char    Long name.
+ * @param shortName     char    Short name.
+ * @param defaultValue  double  Default value.
+ * @param minValue      double  Min value.
+ * @param maxValue      double  Max value.
+ * @param writable      bool    Allow the attribute to be writable.
+ * @param storable      bool    Allow the attribute to be storable.
+ * @param keyable       bool    Allow the attribute to be keyable.
+ * @param hidden        bool    Allow the attribute to be hidden.
+ * @return              MObject The attribute.
+ */
+MObject BaseRigNode::addInputFloatArrayAttribute(MStatus &status, MString longName, MString shortName, double defaultValue,
+                                        bool writable, bool storable, bool keyable, bool hidden)
+{
+    MFnNumericAttribute numAttribFn;
+
+    MObject attrib = numAttribFn.create(longName, shortName, MFnNumericData::kFloat, defaultValue);
+
+    numAttribFn.setWritable(writable);
+    numAttribFn.setStorable(storable);
+    numAttribFn.setKeyable(keyable);
+    numAttribFn.setHidden(hidden);
+    numAttribFn.setArray(true);
+    numAttribFn.setUsesArrayDataBuilder(true);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
  * @brief Add a float output attribute.
  * 
  * @param status    MStatus The status of the creation.
