@@ -82,7 +82,7 @@ MStatus AddFloat::initialize()
     inFloatB = addInputFloatAttribute(stat, MString("FloatB"), MString("fltB"), 0.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
-    outResult = addOuputFloatAttribute(stat, MString("result"), MString("rslt"));
+    outResult = addOutputFloatAttribute(stat, MString("result"), MString("rslt"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
     vector<MObject> inputs = {inFloatA, inFloatB};

@@ -92,7 +92,7 @@ MStatus BasicConstraint::initialize()
     inTransform = addInputMatrixAttribute(stat, MString("inTranform"), MString("inTrans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
-    outTransform = addOuputMatrixAttribute(stat, MString("outTranform"), MString("outTrans"));
+    outTransform = addOutputMatrixAttribute(stat, MString("outTranform"), MString("outTrans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     vector<MObject> inputs = {inTransform};

@@ -101,7 +101,7 @@ MObject BaseRigNode::addInputIntArrayAttribute(MStatus &status, MString longName
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute.
  */
-MObject BaseRigNode::addOuputIntAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addOutputIntAttribute(MStatus &status, MString longName, MString shortName,
                             bool writable, bool storable, bool readable, bool hidden)
 {
     MFnNumericAttribute numAttribFn;
@@ -184,7 +184,7 @@ MObject BaseRigNode::addInputVectorAttribute(MStatus &status, MString longName, 
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute.
  */
-MObject BaseRigNode::addOuputVectorAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addOutputVectorAttribute(MStatus &status, MString longName, MString shortName,
                                 bool writable, bool storable, bool readable, bool hidden)
 {
     MFnNumericAttribute numAttribFn;
@@ -267,7 +267,7 @@ MObject BaseRigNode::addInputAngleAttribute(MStatus &status, MString longName, M
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute.
  */
-MObject BaseRigNode::addOuputAngleAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addOutputAngleAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable, bool storable, bool readable, bool hidden)
 {
     MFnUnitAttribute unitAttribFn;
@@ -385,7 +385,7 @@ MObject BaseRigNode::addInputFloatArrayAttribute(MStatus &status, MString longNa
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute.
  */
-MObject BaseRigNode::addOuputFloatAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addOutputFloatAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable, bool storable, bool readable, bool hidden)
 {
     MFnNumericAttribute numAttribFn;
@@ -432,7 +432,7 @@ float BaseRigNode::getFloat(MDataBlock &dataBlock, MObject input)
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute. 
  */
-MObject BaseRigNode::addInputMatrixAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addInputMatrixAttribute(MStatus &status, MString longName, MString shortName, bool addToNode,
                                 bool writable, bool storable, bool keyable, bool hidden)
 {
     MFnMatrixAttribute matAttribFn;
@@ -444,7 +444,7 @@ MObject BaseRigNode::addInputMatrixAttribute(MStatus &status, MString longName, 
     matAttribFn.setKeyable(keyable);
     matAttribFn.setHidden(hidden);
 
-    status = addAttribute(attrib);
+    if(addToNode) { status = addAttribute(attrib); }
 
     return attrib;
 }
@@ -492,7 +492,7 @@ MObject BaseRigNode::addInputArrayMatrixAttribute(MStatus &status, MString longN
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute.
  */
-MObject BaseRigNode::addOuputMatrixAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addOutputMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable, bool storable, bool readable, bool hidden)
 {
     MFnMatrixAttribute matAttribFn;
@@ -521,7 +521,7 @@ MObject BaseRigNode::addOuputMatrixAttribute(MStatus &status, MString longName, 
  * @param hidden    bool    Allow the attribute to be hidden.
  * @return          MObject The attribute.
  */
-MObject BaseRigNode::addOuputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
+MObject BaseRigNode::addOutputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable, bool storable, bool readable, bool hidden)
 {
     MFnMatrixAttribute matAttribFn;

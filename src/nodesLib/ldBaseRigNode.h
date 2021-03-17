@@ -22,7 +22,7 @@ public:
     static MObject addInputIntArrayAttribute(MStatus &status, MString longName, MString shortName,
                                                 bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
-    static MObject addOuputIntAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addOutputIntAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
     static int getInt(MDataBlock &dataBlock, MObject input);
@@ -32,7 +32,7 @@ public:
                                             double defaultValue, double minValue = -numeric_limits<double>::max(), double maxValue = numeric_limits<double>::max(),
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
-    static MObject addOuputVectorAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addOutputVectorAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
     static MVector getVector(MDataBlock &dataBlock, MObject input);
@@ -42,7 +42,7 @@ public:
                                             double defaultValue, double minValue = -numeric_limits<double>::max(), double maxValue = numeric_limits<double>::max(),
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
-    static MObject addOuputAngleAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addOutputAngleAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
     static MAngle getAngle(MDataBlock &dataBlock, MObject input);
@@ -56,22 +56,22 @@ public:
     static MObject addInputFloatArrayAttribute(MStatus &status, MString longName, MString shortName, double defaultValue,
                                                 bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
-    static MObject addOuputFloatAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addOutputFloatAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
     static float getFloat(MDataBlock &dataBlock, MObject input);
 
     // Add IO Matrix.
-    static MObject addInputMatrixAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addInputMatrixAttribute(MStatus &status, MString longName, MString shortName, bool addToNode = true,
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
     
     static MObject addInputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
 
-    static MObject addOuputMatrixAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addOutputMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
 
-    static MObject addOuputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
+    static MObject addOutputArrayMatrixAttribute(MStatus &status, MString longName, MString shortName,
                                                 bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
 
     static MTransformationMatrix getMatrix(MDataBlock &dataBlock, MObject input);
