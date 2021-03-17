@@ -95,10 +95,10 @@ MStatus BasicConstraint::initialize()
     outTransform = addOuputMatrixAttribute(stat, MString("outTranform"), MString("outTrans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inputs[1] = {inTransform};
-    MObject outputs[1] = {outTransform};
+    vector<MObject> inputs = {inTransform};
+    vector<MObject> outputs = {outTransform};
 
-    setAttributeDepencies(inputs, 1, outputs, 1);
+    setAttributeDepencies(inputs,outputs);
 
     return MS::kSuccess;
 }

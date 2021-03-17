@@ -85,10 +85,10 @@ MStatus AddFloat::initialize()
     outResult = addOuputFloatAttribute(stat, MString("result"), MString("rslt"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
-    MObject inputs[2] = {inFloatA, inFloatB};
-    MObject outputs[1] = {outResult};
+    vector<MObject> inputs = {inFloatA, inFloatB};
+    vector<MObject> outputs = {outResult};
 
-    setAttributeDepencies(inputs, 2, outputs, 1);
+    setAttributeDepencies(inputs, outputs);
 
     return MS::kSuccess;
 }

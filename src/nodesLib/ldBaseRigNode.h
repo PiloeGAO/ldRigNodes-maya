@@ -1,6 +1,8 @@
 #ifndef BASE_RIG_NODE
 #define BASE_RIG_NODE
 
+#include <vector>
+
 #include <maya/MPxNode.h>
 
 #include <maya/MString.h>
@@ -68,13 +70,23 @@ public:
 
     static MTransformationMatrix getMatrix(MDataBlock &dataBlock, MObject input);
     
+    // Add other IO types.
+    static MObject addInputRampAttribute(MStatus &status, MString longName, MString shortName);
+
+    static MObject addInputEnumAttribute(MStatus &status, MString longName, MString shortName,
+                                            int defaultValue, vector<MString> enumArray,
+                                            bool writable = true, bool storable = true, bool keyable = true, bool hidden = false);
+
+    static MObject addInputCompoundAttribute(MStatus &status, MString longName, MString shortName,
+                                            vector<MObject> children, bool array = true);
+
     // Utils.
     static MVector getAxis(int axisAlign = 0);
 
     static void splitMTransformationMatrix(MTransformationMatrix matrix, MVector &position, MQuaternion &angle, double (&scale)[3]);
 
     // Set Depencies.
-    static void setAttributeDepencies(MObject inputs[], int inputLength, MObject outputs[], int ouputLength);
+    static void setAttributeDepencies(vector<MObject> inputs, vector<MObject> outputs);
 };
 
 #endif

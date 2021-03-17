@@ -12,6 +12,8 @@
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnMatrixAttribute.h>
 #include <maya/MFnUnitAttribute.h>
+#include <maya/MFnEnumAttribute.h>
+#include <maya/MFnCompoundAttribute.h>
 
 #include <maya/MString.h>
 #include <maya/MStatus.h>
@@ -21,6 +23,7 @@
 #include <maya/MVector.h>
 #include <maya/MAngle.h>
 #include <maya/MQuaternion.h>
+#include <maya/MRampAttribute.h>
 
 #include "ldBaseRigNode.h"
 
@@ -478,9 +481,8 @@ MObject BaseRigNode::addOuputMatrixAttribute(MStatus &status, MString longName, 
 /**
  * @brief Get the transformation matrix stored in a MObject.
  * 
- * @param dataBlock MDataBlock The
- * @param input 
- * @param output 
+ * @param dataBlock MDataBlock  The data block of the node.
+ * @param input     MObject     The float input.
  */
 MTransformationMatrix BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject input)
 {
@@ -494,6 +496,93 @@ MTransformationMatrix BaseRigNode::getMatrix(MDataBlock &dataBlock, MObject inpu
     { return inTransformHandle.asMatrix(); }
 }
 
+//***********************************************************************************//
+/**
+ * @brief Add a ramp input attribute.
+ * 
+ * @param status    MStatus The status of the creation.
+ * @param longName  MString The long name.
+ * @param shortName MString The short name.
+ * @return MObject  The attribute.
+ */
+MObject BaseRigNode::addInputRampAttribute(MStatus &status, MString longName, MString shortName)
+{
+    MRampAttribute rampAttribFn;
+
+    MObject attrib = rampAttribFn.createCurveRamp(longName, shortName);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Add an enum input attribute.
+ * 
+ * @param status        MStatus         The status of the creation.
+ * @param longName      MString         The long name.
+ * @param shortName     MString         The short name.
+ * @param defaultValue  int             The default index of the enum.
+ * @param enumArray     vector<MString> The data stored inside of the enum.
+ * @param writable      bool            Allow the attribute to be writable.
+ * @param storable      bool            Allow the attribute to be storable.
+ * @param readable      bool            Allow the attribute to be readable.
+ * @param hidden        bool            Allow the attribute to be hidden.
+ * @return              MObject         The attribute.
+ */
+MObject BaseRigNode::addInputEnumAttribute(MStatus &status, MString longName, MString shortName,
+                                            int defaultValue, vector<MString> enumArray,
+                                            bool writable, bool storable, bool keyable, bool hidden)
+{
+    MFnEnumAttribute enumAttribFn;
+
+    MObject attrib = enumAttribFn.create(longName, shortName, defaultValue);
+
+    for (int i = 0; i < enumArray.capacity(); i++)
+    { enumAttribFn.addField(enumArray[i], i); }
+
+    enumAttribFn.setWritable(writable);
+    enumAttribFn.setStorable(storable);
+    enumAttribFn.setKeyable(keyable);
+    enumAttribFn.setHidden(hidden);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
+ * @brief Add a compound input attribute.
+ * 
+ * @param status        MStatus         The status of the creation.
+ * @param longName      MString         The long name.
+ * @param shortName     MString         The short name.
+ * @param children      vector<MObject> The children of the compound.
+ * @param array         bool            Is compound an array of data.
+ * @return              MObject         The attribute.
+ */
+MObject BaseRigNode::addInputCompoundAttribute(MStatus &status, MString longName, MString shortName,
+                                            vector<MObject> children, bool array)
+{
+    MFnCompoundAttribute compoundAttribFn;
+
+    MObject attrib = compoundAttribFn.create(longName, shortName);
+
+    for (int i = 0; i < children.capacity(); i++)
+    {
+        compoundAttribFn.addChild(children[i]);
+    }
+    
+    compoundAttribFn.setArray(array);
+
+    compoundAttribFn.setStorable(true);
+    compoundAttribFn.setWritable(true);
+    compoundAttribFn.setHidden(false);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
 
 //***********************************************************************************//
 /**
@@ -537,12 +626,12 @@ void BaseRigNode::splitMTransformationMatrix(MTransformationMatrix matrix, MVect
  * @param outputs       MObject Outputs list.
  * @param ouputLength   int     Number of outputs.
  */
-void BaseRigNode::setAttributeDepencies(MObject inputs[], int inputLength, MObject outputs[], int ouputLength){
+void BaseRigNode::setAttributeDepencies(vector<MObject> inputs, vector<MObject> outputs){
     MStatus status;
 
-    for (int i = 0; i < inputLength; i++)
+    for (int i = 0; i < inputs.capacity(); i++)
     {
-        for (int o = 0; o < ouputLength; o++)
+        for (int o = 0; o < outputs.capacity(); o++)
         {
             status = attributeAffects(inputs[i], outputs[o]);
             if(!status) {status.perror("attributeAffects");}
