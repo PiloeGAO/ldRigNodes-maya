@@ -1,5 +1,6 @@
 set(SOURCE_FILES
     "core/bezierCurve.cpp"
+    "core/curve.cpp"
     "nodesLib/ldBaseRigNode.cpp"
     "nodesLib/ldAddFloat.cpp"
     "nodesLib/ldBasicConstraint.cpp"
