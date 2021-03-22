@@ -22,6 +22,11 @@ public:
     double fit(double value, double oldMin, double oldMax, double newMin, double newMax);
     void pointScale();
     void pointStretchNSquatch(double t, int pointID, MVector firstControllerPos, MVector lastControllerPos, int alignAxis=1);
+    void addControllers(vector<MTransformationMatrix> controllers);
+    void addControllersTanScl(vector<double> controllersTanScl);
+    MVector getPointPosis(int pointID);
+    MQuaternion getPointRots(int pointID);
+    MVector getPointScale(int pointID);
 private:
     double length();
     

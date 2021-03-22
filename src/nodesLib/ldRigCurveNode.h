@@ -7,6 +7,8 @@
 
 #include "ldBaseRigNode.h"
 
+#include "../core/curve.h"
+
 class RigCurveNode : public BaseRigNode
 {
 public:
@@ -65,7 +67,10 @@ public:
     static MObject outDeformers;
     static MObject outCurveLength;
     static MObject outFLDistance;
-    static MObject outAutoTangents;  
+    static MObject outAutoTangents;
+
+private:
+    Curve curve = Curve();
 };
 
 #endif

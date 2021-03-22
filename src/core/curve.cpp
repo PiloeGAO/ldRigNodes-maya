@@ -62,23 +62,21 @@ void Curve::preCurve()
 {
     preCrvPntDists[0] = 0.0;
 
-    /* Compute the sub curve count. */
+    // Compute the sub curve count.
     int subCrvCount = controllers.capacity() - 1;
 
-    /* Compute the point cont need to store all the pre curve points. */
+    // Compute the point cont need to store all the pre curve points.
     preCrvPntCount = subCurveResolution * subCrvCount;
 
-    /*
-        Resize the precurve point position and tangent array if the subcurves need more points
-        than the default array size.
-    */
+    //Resize the precurve point position and tangent array if the subcurves need more points
+    //than the default array size.
     if(preCrvPntCount > arraySize)
     {
         preCrvPntPosis.setLength(preCrvPntCount);
         preCrvPntTans.setLength(preCrvPntCount);
     }
 
-    /* Loop over the subcurves. */
+    // Loop over the subcurves.
     for (int iCrv = 0; iCrv < subCrvCount; iCrv++)
     {
         if(iCrv == 0)
@@ -113,7 +111,7 @@ void Curve::preCurve()
             );
         }
 
-        /* Compute the sub curve point positions. */
+        // Compute the sub curve point positions.
         for (int iPnt = 0; iPnt < subCurveResolution; iPnt++)
         {
             /* Compute the point ID to store its position in the sub curve point position array. */
@@ -124,30 +122,42 @@ void Curve::preCurve()
 
             /* For the last subcurve we compute the t to fit the last controller position. */
             if(iCrv == subCrvCount - 1)
+            { t = (double)iPnt / (double)(subCurveResolution - 1); }
+
+            // Compute the point position.
+            preCrvPntPosis[pointID] = BezierCurve::pointPosition(
+                subCurveControllers[0],
+                subCurveControllers[1],
+                subCurveControllers[2],
+                subCurveControllers[3],
+                t
+            );
+            
+            // Defining points.
+            MVector preCrvPntPosisPID = preCrvPntPosis[pointID];
+            // Compute the point distance.
+            if(pointID > 0)
             {
-                t = (double)iPnt / (double)(subCurveResolution - 1);
-                preCrvPntPosis[pointID] = BezierCurve::pointPosition(
-                    subCurveControllers[0],
-                    subCurveControllers[1],
-                    subCurveControllers[2],
-                    subCurveControllers[3],
-                    t
-                );
+                MVector preCrvPntPosisPIDM1 = preCrvPntPosis[pointID-1];
+
+                double nexPointDistance = (preCrvPntPosisPID - preCrvPntPosisPIDM1).length();
+                preCrvPntDists[pointID] = preCrvPntDists[pointID-1] + nexPointDistance;
             }
             
-            /* Compute the point distance. */
-            if(pointID > 0)
-            { preCrvPntDists[pointID] = preCrvPntDists[pointID-1] + (preCrvPntPosis[pointID] - preCrvPntPosis[pointID-1]).length(); }
-
-            /* Compute the point target. */
+            // Compute the point target.
             if(pointID == 1)
-            { preCrvPntTans[pointID-1] = (preCrvPntPosis[pointID] - preCrvPntPosis[pointID-1]).normal(); }
-            else
             {
-                preCrvPntTans[pointID-1] = ((preCrvPntPosis[pointID-1] - preCrvPntPosis[pointID-2]) + (preCrvPntPosis[pointID] - preCrvPntPosis[pointID-1])).normal();
+                MVector preCrvPntPosisPIDM1 = preCrvPntPosis[pointID-1];
+                preCrvPntTans[pointID-1] = (preCrvPntPosisPID - preCrvPntPosisPIDM1).normal();
+            }
+            else if (pointID > 1)
+            {
+                MVector preCrvPntPosisPIDM1 = preCrvPntPosis[pointID-1];
+                MVector preCrvPntPosisPIDM2 = preCrvPntPosis[pointID-2];
+                preCrvPntTans[pointID-1] = ((preCrvPntPosisPIDM1 - preCrvPntPosisPIDM2) + (preCrvPntPosisPID - preCrvPntPosisPIDM1)).normal();
                 
                 if(pointID == preCrvPntCount-1)
-                { preCrvPntTans[pointID] = (preCrvPntPosis[pointID] - preCrvPntPosis[pointID-1]).normal(); }
+                { preCrvPntTans[pointID] = (preCrvPntPosisPID - preCrvPntPosisPIDM1).normal(); }
             }
         }
     }
@@ -177,45 +187,54 @@ void Curve::normalize()
     MVector lastInCrvPntPos;
     MVector lastInCrvPntTan;
 
-    /* Loop over the curve point count. */
+    // Loop over the curve point count.
     for (int iPnt = 0; iPnt < pointCount; iPnt++)
     {
-        /* Compute the point distance. */
+        // Compute the point distance.
         double pointU = (double)iPnt / (double)(pointCount - 1);
         float pointUFiltered;
         distributionRamp.getValueAtPosition(pointU, pointUFiltered);
 
-        /* Filter the point U with the distribution options. */
+        // Filter the point U with the distribution options.
         double distU = (double)pointUFiltered * (endDistribution - startDistribution) + startDistribution;
         double pointDist = distU * targetLength;
-
+        
         if(pointDist < length())
         {
             int minID = -1;
             int maxID = -1;
             double blend = 0.0;
 
-            /* Find the point location on the precurve. */
+            // Find the point location on the precurve.
             for (int iPt = 0; iPt < preCrvPntCount; iPt++)
             {
                 if(pointDist >= preCrvPntDists[iPt-1] && pointDist <= preCrvPntDists[iPt])
                 {
-                    minID = iPt-1;
+                    if(iPt > 0) { minID = iPt-1; }
+                    else { minID = 0; }
+
                     maxID = iPt;
                     blend = (pointDist - preCrvPntDists[iPt-1]) / (preCrvPntDists[iPt] - preCrvPntDists[iPt-1]);
                     break;
                 }
             }
+            
+            // Interpolate the point position.
+            MVector maxPointPosis = preCrvPntPosis[maxID];
+            MVector minPointPosis = preCrvPntPosis[minID];
+            crvPntPosis[iPnt] =  (maxPointPosis - minPointPosis) * blend + preCrvPntPosis[minID];
 
-            /* Interpolate the point position. */
-            crvPntPosis[iPnt] = (preCrvPntPosis[maxID] - preCrvPntPosis[minID]) * blend + preCrvPntPosis[minID];
-            crvPntTans[iPnt] = (preCrvPntTans[maxID] - preCrvPntTans[minID]) * blend + preCrvPntTans[minID];
-
-            lastInCrvPntTan = (controllers[controllers.capacity()-1].translation(MSpace::kWorld) - crvPntPosis[iPnt]).normal();
+            MVector maxPointTans = preCrvPntTans[maxID];
+            MVector minPointTans = preCrvPntTans[minID];
+            crvPntTans[iPnt] = (maxPointTans - minPointTans) * blend + preCrvPntTans[minID];
+        
+            MVector lastControllersPosis = controllers[controllers.capacity()-1].translation(MSpace::kWorld);
+            MVector currentCurvePoint = crvPntPosis[iPnt];
+            lastInCrvPntTan = (lastControllersPosis - currentCurvePoint).normal();
             lastInCrvPntPos = crvPntPosis[iPnt];
             lastInCrvPntDist = pointDist;
         }
-        /* Extend the curve with the last point tangent. */
+        // Extend the curve with the last point tangent.
         else
         {
             double extendDist = (pointDist - lastInCrvPntDist);
@@ -348,7 +367,65 @@ void Curve::pointStretchNSquatch(double t, int pointID, MVector firstControllerP
     }
 }
 
+/**
+ * @brief Get the curve length.
+ * 
+ * @return double Curve length.
+ */
 double Curve::length()
 {
     return preCrvPntDists[preCrvPntCount-1];
+}
+
+/**
+ * @brief Add controllers to the curve.
+ * 
+ * @param inControllers vector<MTransformationMatrix> List of controllers.
+ */
+void Curve::addControllers(vector<MTransformationMatrix> inControllers)
+{
+    controllers = inControllers;
+}
+
+/**
+ * @brief Add controllers tangent scales.
+ * 
+ * @param inControllersTanScl vector<double> List of controllers tangent scales.
+ */
+void Curve::addControllersTanScl(vector<double> inControllersTanScl)
+{
+    controllersTanScl = inControllersTanScl;
+}
+
+/**
+ * @brief Get the Point Position.
+ * 
+ * @param pID int Point ID.
+ * @return MVector Point position.
+ */
+MVector Curve::getPointPosis(int pID)
+{
+    return crvPntPosis[pID];
+}
+
+/**
+ * @brief Get the Point Rotation.
+ * 
+ * @param pID Point ID.
+ * @return MQuaternion Point rotation.
+ */
+MQuaternion Curve::getPointRots(int pID)
+{
+    return crvPntRots[pID];
+}
+
+/**
+ * @brief Get the Point Scale.
+ * 
+ * @param pID Point ID.
+ * @return MVector Point scale.
+ */
+MVector Curve::getPointScale(int pID)
+{
+    return crvPntScls[pID];
 }

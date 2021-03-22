@@ -15,7 +15,12 @@
 #include <maya/MTypeId.h>
 #include <maya/MPlug.h>
 #include <maya/MDataBlock.h>
+#include <maya/MArrayDataHandle.h>
+#include <maya/MArrayDataBuilder.h>
 #include <maya/MDataHandle.h>
+#include <maya/MMatrix.h>
+
+#include "../core/curve.h"
 
 #include "ldRigCurveNode.h"
 
@@ -80,15 +85,98 @@ MObject RigCurveNode::outAutoTangents;
 MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
 {
     MStatus returnStatus;
-    /*
-    if(plug == outTransform)
-    {
-        return MS::kSuccess;
 
-    } else {
-        return MS::kUnknownParameter;
+    // Get the controller list handle.
+    MStatus status;
+    MArrayDataHandle inControllersHandle = data.inputArrayValue(inControllers, &status);
+    if(!status) {status.perror("inControllersHandle:"); return status;}
+
+    // Get the controllers count.
+    int controllersCount = inControllersHandle.elementCount();
+
+    // Define the array list of ik controllers.
+    vector<MTransformationMatrix> ikControllersTrans = vector<MTransformationMatrix> (controllersCount);
+    vector<double> controllersTangentScale = vector<double> (controllersCount);
+
+    // Loop over the controller count.
+    for (int i = 0; i < controllersCount; i++)
+    {
+        // Jump the array to the current controller.
+        inControllersHandle.jumpToElement(i);
+
+        // Get the controller.
+        MDataHandle controller = inControllersHandle.inputValue();
+
+        // Get the ik controller.
+        ikControllersTrans[i] = MTransformationMatrix(controller.child(inIKController).asMatrix());
+        controllersTangentScale[i] = (double) controller.child(inScaleTangent).asFloat();
     }
-    */
+
+    cout << "Controller count :" << ikControllersTrans.capacity() << endl;
+    
+    if(controllersCount > 2)
+    {
+        // Set the curve parameters.
+        curve.pointCount = getInt(data, inDeformCount);
+        curve.stretchable = (bool) getInt(data, inStretchable);
+        curve.limitStretch = (bool) getInt(data, inStretchLimit);
+        curve.maxStretchFactor = getFloat(data, inStretchLengthFactor);
+        curve.minStretchFactor = getFloat(data, inSquatchLengthFactor);
+        curve.curveRestLength = getFloat(data, inCurveRestLength);
+        curve.ctrlRestLength = getFloat(data, inControllerRestDistance);
+        curve.alignAxis = getInt(data, inTwistAlignAxis);
+        curve.startDistribution = getFloat(data, inDistributionStart);
+        curve.endDistribution = getFloat(data, inDistributionEnd);
+        curve.moveDistribution = getFloat(data, inDistributionMove);
+        curve.stretchAxis0Scale = getFloat(data, inStretchAxis0Scale);
+        curve.stretchAxis1Scale = getFloat(data, inStretchAxis1Scale);
+        curve.squatchAxis0Scale = getFloat(data, inSquatchAxis0Scale);
+        curve.squatchAxis1Scale = getFloat(data, inSquatchAxis1Scale);
+        curve.distributionRamp = MRampAttribute(thisMObject(), inDistributionProfil);
+        curve.twistRamp = MRampAttribute(thisMObject(), inTwistProfil);
+        curve.stretchRamp = MRampAttribute(thisMObject(), inStretchProfil);
+        curve.squatchRamp = MRampAttribute(thisMObject(), inSquatchProfil);
+        curve.stretchNSquatchMode = (bool) getInt(data, inSNSMode);
+        curve.addControllers(ikControllersTrans);
+        curve.addControllersTanScl(controllersTangentScale);
+
+        // Compute the curve.
+        curve.preCurve();
+        curve.normalize();
+    }
+    
+    if(plug == outDeformers)
+    {
+        cout << "Out deformers found" << endl;
+
+        MArrayDataBuilder outArrayTranform = MArrayDataBuilder(outDeformers, curve.pointCount); //Obsolete but new constructor not work.
+
+        for (int i = 0; i < curve.pointCount; i++)
+        {
+            cout << "current curve point: " << i << endl;
+            MTransformationMatrix deformerTrans;
+            deformerTrans.setTranslation(curve.getPointPosis(i), MSpace::kWorld);
+            deformerTrans.setRotationQuaternion(curve.getPointRots(i).x, curve.getPointRots(i).y, curve.getPointRots(i).z, curve.getPointRots(i).w);
+            double scale[3] = {curve.getPointScale(i).x, curve.getPointScale(i).y, curve.getPointScale(i).z};
+            deformerTrans.setScale(scale, MSpace::kWorld);
+            
+            MDataHandle dataHandle = outArrayTranform.addElement(i);
+            dataHandle.setMMatrix(deformerTrans.asMatrix());
+        }
+
+        cout << "END" << endl;
+
+        MArrayDataHandle outTransformHandle = data.outputArrayValue(outDeformers);
+        
+        outTransformHandle.set(outArrayTranform);
+        outTransformHandle.setClean();
+
+        data.setClean(plug);
+    
+        return MS::kSuccess;
+    } else
+    { return MS::kUnknownParameter; }
+    
     return MS::kSuccess;
 }
 
@@ -126,102 +214,102 @@ MStatus RigCurveNode::initialize()
 
     // Distribution parameters.
     vector<MString> distributionModes = {MString("Normalized")};
-    MObject inDistributionMode = addInputEnumAttribute(stat, MString("distributionMode"), MString("distMode"), 0, distributionModes);
+    inDistributionMode = addInputEnumAttribute(stat, MString("distributionMode"), MString("distMode"), 0, distributionModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inDistributionStart = addInputFloatAttribute(stat, MString("distributionStart"), MString("distStart"), 0.0, 0.0, 1.0);
+    inDistributionStart = addInputFloatAttribute(stat, MString("distributionStart"), MString("distStart"), 0.0, 0.0, 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inDistributionEnd = addInputFloatAttribute(stat, MString("distributionEnd"), MString("distEnd"), 1.0, 0.0, 1.0);
+    inDistributionEnd = addInputFloatAttribute(stat, MString("distributionEnd"), MString("distEnd"), 1.0, 0.0, 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inDistributionMove = addInputFloatAttribute(stat, MString("distributionMove"), MString("distMove"), 0.0, -10.0, 10.0);
+    inDistributionMove = addInputFloatAttribute(stat, MString("distributionMove"), MString("distMove"), 0.0, -10.0, 10.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inDistributionProfil = addInputRampAttribute(stat, MString("distributionProfil"), MString("distProfil"));
+    inDistributionProfil = addInputRampAttribute(stat, MString("distributionProfil"), MString("distProfil"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
         
     // Twist parameters.
     vector<MString> twistModes = {MString("First And Last")};
-    MObject inTwistMode = addInputEnumAttribute(stat, MString("twistMode"), MString("twistMode"), 0, twistModes);
+    inTwistMode = addInputEnumAttribute(stat, MString("twistMode"), MString("twistMode"), 0, twistModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     vector<MString> twistAlignAxisModes = {MString("+X"), MString("+Y"), MString("+Z"), MString("-X"), MString("-Y"), MString("-Z")};
-    MObject inTwistAlignAxis = addInputEnumAttribute(stat, MString("twistAlignAxis"), MString("twistAlign"), 1, twistAlignAxisModes);
+    inTwistAlignAxis = addInputEnumAttribute(stat, MString("twistAlignAxis"), MString("twistAlign"), 1, twistAlignAxisModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inTwistProfil = addInputRampAttribute(stat, MString("twistProfil"), MString("twistProfil"));
+    inTwistProfil = addInputRampAttribute(stat, MString("twistProfil"), MString("twistProfil"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     // Scale parameters.
     vector<MString> scaleModes = {MString("First And Last")};
-    MObject inScaleMode = addInputEnumAttribute(stat, MString("scaleMode"), MString("scaleMode"), 0, scaleModes);
+    inScaleMode = addInputEnumAttribute(stat, MString("scaleMode"), MString("scaleMode"), 0, scaleModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inScaleProfil = addInputRampAttribute(stat, MString("scaleProfil"), MString("scaleProfil"));
+    inScaleProfil = addInputRampAttribute(stat, MString("scaleProfil"), MString("scaleProfil"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     // Stretch N Squatch parameters.
     vector<MString> activeStretch = {MString("disable"), MString("enable")};
-    MObject inStretchable = addInputEnumAttribute(stat, MString("stretchable"), MString("stretch"), 1, activeStretch);
+    inStretchable = addInputEnumAttribute(stat, MString("stretchable"), MString("stretch"), 1, activeStretch);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     vector<MString> limitStretch = {MString("disable"), MString("enable")};
-    MObject inStretchLimit = addInputEnumAttribute(stat, MString("limitStretch"), MString("lStretch"), 0, limitStretch);
+    inStretchLimit = addInputEnumAttribute(stat, MString("limitStretch"), MString("lStretch"), 0, limitStretch);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inStretchLengthFactor = addInputFloatAttribute(stat, MString("stretchLengthFactor"), MString("maxSLF"), 1.2);
+    inStretchLengthFactor = addInputFloatAttribute(stat, MString("stretchLengthFactor"), MString("maxSLF"), 1.2);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inSquatchLengthFactor = addInputFloatAttribute(stat, MString("squatchLengthFactor"), MString("minSLF"), 0.8);
+    inSquatchLengthFactor = addInputFloatAttribute(stat, MString("squatchLengthFactor"), MString("minSLF"), 0.8);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     vector<MString> snsModes = {MString("None"), MString("Controllers Distance")};
-    MObject inSNSMode = addInputEnumAttribute(stat, MString("stretchSquatchMode"), MString("snsMode"), 0, snsModes);
+    inSNSMode = addInputEnumAttribute(stat, MString("stretchSquatchMode"), MString("snsMode"), 0, snsModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inStretchAxis0Scale = addInputFloatAttribute(stat, MString("stretchAxis0Scale"), MString("strchAxis0Scl"), 0.5);
+    inStretchAxis0Scale = addInputFloatAttribute(stat, MString("stretchAxis0Scale"), MString("strchAxis0Scl"), 0.5);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inStretchAxis1Scale = addInputFloatAttribute(stat, MString("stretchAxis1Scale"), MString("strchAxis1Scl"), 0.5);
+    inStretchAxis1Scale = addInputFloatAttribute(stat, MString("stretchAxis1Scale"), MString("strchAxis1Scl"), 0.5);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inStretchProfil = addInputRampAttribute(stat, MString("stretchProfil"), MString("strchProfil"));
+    inStretchProfil = addInputRampAttribute(stat, MString("stretchProfil"), MString("strchProfil"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inSquatchAxis0Scale = addInputFloatAttribute(stat, MString("squatchAxis0Scale"), MString("sqtchAxis0Scl"), 0.5);
+    inSquatchAxis0Scale = addInputFloatAttribute(stat, MString("squatchAxis0Scale"), MString("sqtchAxis0Scl"), 0.5);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inSquatchAxis1Scale = addInputFloatAttribute(stat, MString("squatchAxis1Scale"), MString("sqtchAxis1Scl"), 0.5);
+    inSquatchAxis1Scale = addInputFloatAttribute(stat, MString("squatchAxis1Scale"), MString("sqtchAxis1Scl"), 0.5);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject inSquatchProfil = addInputRampAttribute(stat, MString("squatchProfil"), MString("sqtchProfil"));
+    inSquatchProfil = addInputRampAttribute(stat, MString("squatchProfil"), MString("sqtchProfil"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     // Controllers parameters.
-    MObject inIKController = addInputMatrixAttribute(stat, MString("ikController"), MString("ikCtrl"), false);
-    MObject inFKController = addInputMatrixAttribute(stat, MString("fkController"), MString("fkCtrl"), false);
-    MObject inPrevTangent = addInputMatrixAttribute(stat, MString("prevTangent"), MString("pTan"), false);
-    MObject inNextTangent = addInputMatrixAttribute(stat, MString("nextTangent"), MString("nTan"), false);
+    inIKController = addInputMatrixAttribute(stat, MString("ikController"), MString("ikCtrl"), false);
+    inFKController = addInputMatrixAttribute(stat, MString("fkController"), MString("fkCtrl"), false);
+    inPrevTangent = addInputMatrixAttribute(stat, MString("prevTangent"), MString("pTan"), false);
+    inNextTangent = addInputMatrixAttribute(stat, MString("nextTangent"), MString("nTan"), false);
 
-    MObject inScaleTangent = addInputFloatAttribute(stat, MString("scaleTangent"), MString("sclTan"), 1.0);
+    inScaleTangent = addInputFloatAttribute(stat, MString("scaleTangent"), MString("sclTan"), 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
     vector<MObject> controllerAttributes = {inIKController, inFKController, inPrevTangent, inNextTangent, inScaleTangent};
-    MObject inControllers = addInputCompoundAttribute(stat, MString("controllers"), MString("ctrls"), controllerAttributes);
+    inControllers = addInputCompoundAttribute(stat, MString("controllers"), MString("ctrls"), controllerAttributes, true);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     //Output parameters.
-    MObject outDeformers = addOutputArrayMatrixAttribute(stat, MString("deformers"), MString("defs"));
+    outDeformers = addOutputArrayMatrixAttribute(stat, MString("deformers"), MString("defs"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject outCurveLength = addOutputFloatAttribute(stat, MString("curveLength"), MString("crvLength"));
+    outCurveLength = addOutputFloatAttribute(stat, MString("curveLength"), MString("crvLength"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject outFLDistance = addOutputFloatAttribute(stat, MString("controllerFLDistance"), MString("ctrlFLDist"));
+    outFLDistance = addOutputFloatAttribute(stat, MString("controllerFLDistance"), MString("ctrlFLDist"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    MObject outAutoTangents = addOutputArrayMatrixAttribute(stat, MString("autoTangents"), MString("autoTans"));
+    outAutoTangents = addOutputArrayMatrixAttribute(stat, MString("autoTangents"), MString("autoTans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
 
