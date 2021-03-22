@@ -9,7 +9,7 @@ global proc AEldRigCurveNodeTemplate( string $nodeName )
 
             editorTemplate -label "Deformer Count" -addControl "deformerCount";
             editorTemplate -label "Curve Rest Length" -addControl "curveRestLength";
-            editorTemplate -label "Controllers Rest Distance" -addControl "contollersRestDistance";
+            editorTemplate -label "Controllers Rest Distance" -addControl "controllerRestDistance";
             editorTemplate -label "Fk Ik Blend" -addControl "fkIkBlend";
             editorTemplate -label "Stretchable" -addControl "stretchable";
             editorTemplate -label "Limit Stretch" -addControl "limitStretch";
