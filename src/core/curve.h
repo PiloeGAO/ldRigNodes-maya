@@ -19,11 +19,13 @@ public:
     void preCurve();
     void normalize();
     void pointRotation(MQuaternion quatC1, MQuaternion quatC2, MVector pointTarget, double t, int pointID, int alignAxis=1);
+    void pointScale(double scaleC1[3], double scaleC2[3], double t, int pointID);
     double fit(double value, double oldMin, double oldMax, double newMin, double newMax);
-    void pointScale();
     void pointStretchNSquatch(double t, int pointID, MVector firstControllerPos, MVector lastControllerPos, int alignAxis=1);
+    
     void addControllers(vector<MTransformationMatrix> controllers);
     void addControllersTanScl(vector<double> controllersTanScl);
+
     MVector getPointPosis(int pointID);
     MQuaternion getPointRots(int pointID);
     MVector getPointScale(int pointID);

@@ -58,6 +58,10 @@ void Curve::middleSubCurveTangent(MVector c0, MVector c1, MVector c2, MVector c3
     subCurveControllers[3] = c2;
 }
 
+/**
+ * @brief Compute the pre-curve.
+ * 
+ */
 void Curve::preCurve()
 {
     preCrvPntDists[0] = 0.0;
@@ -163,6 +167,10 @@ void Curve::preCurve()
     }
 }
 
+/**
+ * @brief Normalize the pre-curve and compute the final curve.
+ * 
+ */
 void Curve::normalize()
 {
     double targetLength = curveRestLength;
@@ -251,6 +259,19 @@ void Curve::normalize()
             alignAxis
         );
 
+        double controller0Scale[3];
+        controllers[0].getScale(controller0Scale, MSpace::kWorld);
+
+        double controllerLastScale[3];
+        controllers[controllers.capacity()-1].getScale(controllerLastScale, MSpace::kWorld);
+
+        pointScale(
+            controller0Scale,
+            controllerLastScale,
+            pointU,
+            iPnt
+        );
+
         if(stretchNSquatchMode)
         {
             pointStretchNSquatch(
@@ -264,6 +285,16 @@ void Curve::normalize()
     }    
 }
 
+/**
+ * @brief Compute the point rotation based on t.
+ * 
+ * @param quatC1        MQuaternion Controller 1 rotation.
+ * @param quatC2        MQuaternion Controller 2 rotation.
+ * @param pointTarget   MVector     Point tangent.
+ * @param t             double      Point position
+ * @param pointID       int         Point ID.
+ * @param alignAxis     int         Align axis.
+ */
 void Curve::pointRotation(MQuaternion quatC1, MQuaternion quatC2, MVector pointTarget, double t, int pointID, int alignAxis)
 {
     float tFiltered;
@@ -295,12 +326,27 @@ void Curve::pointRotation(MQuaternion quatC1, MQuaternion quatC2, MVector pointT
     crvPntRots[pointID] *= correctiveRot;
 }
 
+/**
+ * @brief Compute the point scale based on t.
+ * 
+ * @param scaleC1 double[3] Controller 1 scale.
+ * @param scaleC2 double[3] Controller 2 scale. 
+ * @param t       double    Point position.
+ * @param pointID int       Point ID.
+ */
+void Curve::pointScale(double scaleC1[3], double scaleC2[3], double t, int pointID)
+{
+    crvPntScls[pointID] = MVector(
+        scaleC1[0]*(1.0-t) + scaleC2[0]*t,
+        scaleC1[1]*(1.0-t) + scaleC2[1]*t,
+        scaleC1[2]*(1.0-t) + scaleC2[2]*t
+    );
+}
+
 double Curve::fit(double value, double oldMin, double oldMax, double newMin, double newMax)
 {
     return (value - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
 }
-
-void Curve::pointScale(){}
 
 void Curve::pointStretchNSquatch(double t, int pointID, MVector firstControllerPos, MVector lastControllerPos, int alignAxis)
 {
@@ -342,28 +388,28 @@ void Curve::pointStretchNSquatch(double t, int pointID, MVector firstControllerP
         }
         else
         {
-            axis0Scale = fit(currentLength, restLength, maxLength, 1.0, squatchAxis0ScaleFiltered);
-            axis1Scale = fit(currentLength, restLength, maxLength, 1.0, squatchAxis1ScaleFiltered);
+            axis0Scale = fit(currentLength, minLength, restLength, squatchAxis0ScaleFiltered, 1.0);
+            axis1Scale = fit(currentLength, minLength, restLength, squatchAxis1ScaleFiltered, 1.0);
         }
     }
 
     if(alignAxis == 0 || alignAxis == 3)
     {
-        crvPntScls[pointID].x = 1.0;
-        crvPntScls[pointID].y = axis0Scale;
-        crvPntScls[pointID].z = axis1Scale;
+        crvPntScls[pointID].x *= 1.0;
+        crvPntScls[pointID].y *= axis0Scale;
+        crvPntScls[pointID].z *= axis1Scale;
     }
     else if (alignAxis == 1 || alignAxis == 4)
     {
-        crvPntScls[pointID].x = axis0Scale;
-        crvPntScls[pointID].y = 1.0;
-        crvPntScls[pointID].z = axis1Scale;
+        crvPntScls[pointID].x *= axis0Scale;
+        crvPntScls[pointID].y *= 1.0;
+        crvPntScls[pointID].z *= axis1Scale;
     }
     else if (alignAxis == 2 || alignAxis == 5)
     {
-        crvPntScls[pointID].x = axis0Scale;
-        crvPntScls[pointID].y = axis1Scale;
-        crvPntScls[pointID].z = 1.0;
+        crvPntScls[pointID].x *= axis0Scale;
+        crvPntScls[pointID].y *= axis1Scale;
+        crvPntScls[pointID].z *= 1.0;
     }
 }
 

@@ -111,8 +111,6 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
         ikControllersTrans[i] = MTransformationMatrix(controller.child(inIKController).asMatrix());
         controllersTangentScale[i] = (double) controller.child(inScaleTangent).asFloat();
     }
-
-    cout << "Controller count :" << ikControllersTrans.capacity() << endl;
     
     if(controllersCount > 2)
     {
@@ -147,13 +145,10 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
     
     if(plug == outDeformers)
     {
-        cout << "Out deformers found" << endl;
-
         MArrayDataBuilder outArrayTranform = MArrayDataBuilder(outDeformers, curve.pointCount); //Obsolete but new constructor not work.
 
         for (int i = 0; i < curve.pointCount; i++)
         {
-            cout << "current curve point: " << i << endl;
             MTransformationMatrix deformerTrans;
             deformerTrans.setTranslation(curve.getPointPosis(i), MSpace::kWorld);
             deformerTrans.setRotationQuaternion(curve.getPointRots(i).x, curve.getPointRots(i).y, curve.getPointRots(i).z, curve.getPointRots(i).w);
@@ -163,8 +158,6 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
             MDataHandle dataHandle = outArrayTranform.addElement(i);
             dataHandle.setMMatrix(deformerTrans.asMatrix());
         }
-
-        cout << "END" << endl;
 
         MArrayDataHandle outTransformHandle = data.outputArrayValue(outDeformers);
         
