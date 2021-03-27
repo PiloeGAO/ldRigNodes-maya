@@ -30,8 +30,10 @@ MObject TwistNode::inStartRange;
 MObject TwistNode::inEndRange;
 MObject TwistNode::inMatrixAPos;
 MObject TwistNode::inMatrixARot;
+MObject TwistNode::inMatrixAScl;
 MObject TwistNode::inMatrixBPos;
 MObject TwistNode::inMatrixBRot;
+MObject TwistNode::inMatrixBScl;
 MObject TwistNode::inTwistCount;
 MObject TwistNode::inTwistProfil;
 MObject TwistNode::inAlignAxis;
@@ -56,8 +58,11 @@ MStatus TwistNode::compute(const MPlug& plug, MDataBlock& data)
 
         MTransformationMatrix matrixAPos = getMatrix(data, inMatrixAPos);
         MTransformationMatrix matrixARot = getMatrix(data, inMatrixARot);
+        MTransformationMatrix matrixAScl = getMatrix(data, inMatrixAScl);
+
         MTransformationMatrix matrixBPos = getMatrix(data, inMatrixBPos);
         MTransformationMatrix matrixBRot = getMatrix(data, inMatrixBRot);
+        MTransformationMatrix matrixBScl = getMatrix(data, inMatrixBScl);
 
         int twistCount = getInt(data, inTwistCount);
         double startRange = getFloat(data, inStartRange);
@@ -72,6 +77,10 @@ MStatus TwistNode::compute(const MPlug& plug, MDataBlock& data)
         MVector posB = matrixBPos.translation(MSpace::kWorld);
         MQuaternion rotA = matrixARot.rotation();
         MQuaternion rotB = matrixBRot.rotation();
+        double sclA[3];
+        double sclB[3];
+        matrixAScl.getScale(sclA, MSpace::kWorld);
+        matrixBScl.getScale(sclB, MSpace::kWorld);
 
         // Set output.
         MArrayDataBuilder outTransformsArray = MArrayDataBuilder(outTransforms, twistCount); //Obsolete but new constructor not work.
@@ -96,12 +105,14 @@ MStatus TwistNode::compute(const MPlug& plug, MDataBlock& data)
             MQuaternion pointRot = pointRotation(axisDir, rotA, rotB, (double)tRot, alignAxis);
 
             // Compute the scale.
-            // TODO
+            double pointScl[3];
+            pointScale(sclA, sclB, tPos, pointScl);
 
             // Compute the transformation.
             MTransformationMatrix pointTrans;
             pointTrans.setTranslation(pointPos, MSpace::kWorld);
             pointTrans.setRotationQuaternion(pointRot.x, pointRot.y, pointRot.z, pointRot.w);
+            pointTrans.setScale(pointScl, MSpace::kWorld);
 
             // Add an output tothe transform output.
             MDataHandle dataHandle = outTransformsArray.addElement(i);
@@ -151,11 +162,17 @@ MStatus TwistNode::initialize()
 
     inMatrixARot = addInputMatrixAttribute(stat, MString("matrixARot"), MString("matAR"));;
     if(!stat) {stat.perror("addAttribute"); return stat;}
+    
+    inMatrixAScl = addInputMatrixAttribute(stat, MString("matrixAScl"), MString("matAS"));;
+    if(!stat) {stat.perror("addAttribute"); return stat;}
 
     inMatrixBPos = addInputMatrixAttribute(stat, MString("matrixBPos"), MString("matBP"));;
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     inMatrixBRot = addInputMatrixAttribute(stat, MString("matrixBRot"), MString("matBR"));;
+    if(!stat) {stat.perror("addAttribute"); return stat;}
+    
+    inMatrixBScl = addInputMatrixAttribute(stat, MString("matrixBScl"), MString("matBS"));;
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     inTwistCount = addInputIntAttribute(stat, MString("twistCount"), MString("tc"), 5);
@@ -176,8 +193,10 @@ MStatus TwistNode::initialize()
                                 inEndRange,
                                 inMatrixAPos,
                                 inMatrixARot,
+                                inMatrixAScl,
                                 inMatrixBPos,
                                 inMatrixBRot,
+                                inMatrixBScl,
                                 inTwistCount,
                                 inTwistProfil,
                                 inAlignAxis
@@ -195,8 +214,8 @@ MStatus TwistNode::initialize()
  * @param posA          MVector Position A.
  * @param posB          MVector Position B. 
  * @param tPos          double  Alpha.
- * @param outPos        MVector Output position.
- * @param outAxisDir    MVector Output axis direction. 
+ * @param &outPos        MVector Output position.
+ * @param &outAxisDir    MVector Output axis direction. 
  */
 void TwistNode::pointPosition(MVector posA, MVector posB, double tPos, MVector &outPos, MVector &outAxisDir)
 {
@@ -239,4 +258,19 @@ MQuaternion TwistNode::pointRotation(MVector axisDir, MQuaternion rotA, MQuatern
     rot *= rotToAxis;
 
     return rot;
+}
+
+/**
+ * @brief Compute the point scale.
+ * 
+ * @param sclA      double[3] Scale A.
+ * @param sclB      double[3] Scale B.
+ * @param tPos      double    Alpha.
+ * @param &pointScl double[3] The computed scale.
+ */
+void TwistNode::pointScale(double sclA[3], double sclB[3],double tPos, double (&pointScl)[3])
+{
+    pointScl[0] = sclA[0] * (1.0 - tPos) + sclB[0] * tPos;
+    pointScl[1] = sclA[1] * (1.0 - tPos) + sclB[1] * tPos;
+    pointScl[2] = sclA[2] * (1.0 - tPos) + sclB[2] * tPos;
 }

@@ -17,6 +17,7 @@ public:
 
     void pointPosition(MVector posA, MVector posB, double tPos, MVector &outPos, MVector &outAxisDir);
     MQuaternion pointRotation(MVector axisDir, MQuaternion rotA, MQuaternion rotB, double tPos, int alignAxis);
+    void pointScale(double sclA[3], double sclB[3],double tPos, double (&pointScl)[3]);
 
 public:
     static MTypeId id;
@@ -25,8 +26,10 @@ public:
     static MObject inEndRange;
     static MObject inMatrixAPos;
     static MObject inMatrixARot;
+    static MObject inMatrixAScl;
     static MObject inMatrixBPos;
     static MObject inMatrixBRot;
+    static MObject inMatrixBScl;
     static MObject inTwistCount;
     static MObject inTwistProfil;
     static MObject inAlignAxis;
