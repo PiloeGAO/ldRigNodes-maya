@@ -21,6 +21,7 @@
 #include "nodesLib/ldBasicConstraint.h"
 #include "nodesLib/ldRigCurveNode.h"
 #include "nodesLib/ldTwistNode.h"
+#include "nodesLib/ldFkIk2Bones.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -50,6 +51,9 @@ MStatus initializePlugin(MObject obj)
     status = plugin.registerNode("ldRigTwistNode", TwistNode::id, &TwistNode::creator, &TwistNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
+    status = plugin.registerNode("ldRigFkIk2Bones", FkIk2Bones::id, &FkIk2Bones::creator, &FkIk2Bones::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
+
     return status;
 }
 
@@ -75,6 +79,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
 
     status = plugin.deregisterNode(TwistNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+
+    status = plugin.deregisterNode(FkIk2Bones::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;

@@ -6,6 +6,7 @@ set(SOURCE_FILES
     "nodesLib/ldBasicConstraint.cpp"
     "nodesLib/ldRigCurveNode.cpp"
     "nodesLib/ldTwistNode.cpp"
+    "nodesLib/ldFkIk2Bones.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)

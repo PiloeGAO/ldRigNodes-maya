@@ -1,0 +1,59 @@
+// Original file from Guillaume Baratte.
+global proc AEldRigFkIk2BonesTemplate( string $nodeName )
+{
+    // Add the Scroll Layout.
+    editorTemplate -beginScrollLayout;
+
+        // Add the curve options Layout.
+        editorTemplate -beginLayout "Bones Length" -collapse 0;
+
+            editorTemplate -label "Bone 1 Length" -addControl "bone1Length";
+            editorTemplate -label "Bone 2 Length" -addControl "bone2Length";
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "Bones Scale" -collapse 0;
+
+            editorTemplate -label "Bone 1 Scale" -addControl "bone1Scale";
+            editorTemplate -label "Bone 2 Scale" -addControl "bone2Scale";
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "Align Options" -collapse 0;
+
+            editorTemplate -label "Align Axis" -addControl "alignAxis";
+            editorTemplate -label "UpVector Axis" -addControl "upVectorAxis";
+            editorTemplate -label "Negative Scale" -addControl "negativeScale";
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "Behavior Options" -collapse 0;
+
+            editorTemplate -label "Stretchable" -addControl "activateStretch";
+            editorTemplate -label "Invert IK" -addControl "invertIK";
+            editorTemplate -label "Blend FK<->IK" -addControl "blendFkIk";
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "IK Matrix" -collapse 1;
+
+            editorTemplate -label "IK Root" -addControl "ikRoot";
+            editorTemplate -label "IK UpVector" -addControl "ikUpVector";
+            editorTemplate -label "IK Effector" -addControl "ikEffector";
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "FK Matrix" -collapse 1;
+
+            editorTemplate -label "FK Bone 1" -addControl "fkBone1";
+            editorTemplate -label "FK Bone 2" -addControl "fkBone2";
+            editorTemplate -label "FK Bone 3" -addControl "fkBone3";
+
+        editorTemplate -endLayout;
+
+
+
+    // Add the maya extra controls layout.
+    editorTemplate -addExtraControls;
+    editorTemplate -endScrollLayout;
+}

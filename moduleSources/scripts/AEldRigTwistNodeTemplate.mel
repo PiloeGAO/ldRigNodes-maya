@@ -1,3 +1,4 @@
+// Original file from Guillaume Baratte.
 global proc AEldRigTwistNodeTemplate( string $nodeName )
 {
     // Add the Scroll Layout.
