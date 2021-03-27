@@ -20,6 +20,7 @@
 #include "nodesLib/ldAddFloat.h"
 #include "nodesLib/ldBasicConstraint.h"
 #include "nodesLib/ldRigCurveNode.h"
+#include "nodesLib/ldTwistNode.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -46,6 +47,9 @@ MStatus initializePlugin(MObject obj)
     status = plugin.registerNode("ldRigCurveNode", RigCurveNode::id, &RigCurveNode::creator, &RigCurveNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
+    status = plugin.registerNode("ldRigTwistNode", TwistNode::id, &TwistNode::creator, &TwistNode::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
+
     return status;
 }
 
@@ -68,6 +72,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
     
     status = plugin.deregisterNode(RigCurveNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+
+    status = plugin.deregisterNode(TwistNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;

@@ -1,0 +1,29 @@
+global proc AEldRigTwistNodeTemplate( string $nodeName )
+{
+    // Add the Scroll Layout.
+    editorTemplate -beginScrollLayout;
+
+        // Add the curve options Layout.
+        editorTemplate -beginLayout "Curve Options" -collapse 0;
+
+            editorTemplate -label "Twist Count" -addControl "twistCount";
+            editorTemplate -label "Align Axis" -addControl "alignAxis";
+            editorTemplate -label "Start Distribution" -addControl "startRange";
+            editorTemplate -label "End Distribution" -addControl "endRange";
+            AEaddRampControl($nodeName+".twistProfil");
+
+        editorTemplate -endLayout;
+
+    // Add the maya extra controls layout.
+    editorTemplate -addExtraControls;
+    editorTemplate -endScrollLayout;
+
+    // Set Distribution Profil ramp.
+    setAttr( $nodeName+".twistProfil[0].twistProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".twistProfil[0].twistProfil_Position") 0.0;
+    setAttr( $nodeName+".twistProfil[0].twistProfil_Interp") 1;
+
+    setAttr( $nodeName+".twistProfil[1].twistProfil_FloatValue") 1.0;
+    setAttr( $nodeName+".twistProfil[1].twistProfil_Position") 1.0;
+    setAttr( $nodeName+".twistProfil[1].twistProfil_Interp") 1;
+}
