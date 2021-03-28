@@ -15,6 +15,16 @@ public:
     static void* creator();
     static MStatus initialize();
 
+    double cosinusLaw(double a, double b, double c);
+    void computeIk(MVector rootPos, MVector upPos, MVector effPos,
+                    double b1Length, double b2Length,
+                    int activeStretch, int alignAxis, int upVectorAxis,
+                    double negativeScale, double invertIk,
+                    MTransformationMatrix &b1Trans, MTransformationMatrix &b2Trans, MTransformationMatrix &b3Trans);
+    MTransformationMatrix blendTransform(MTransformationMatrix matrixA, MTransformationMatrix matrixB, double blend);
+    MTransformationMatrix buildTransform(MVector pos, MVector axis0, MVector axis1,
+                                        int alignAxis, int upVectorAxis, int negativeScale);
+
 public:
     static MTypeId id;
 
