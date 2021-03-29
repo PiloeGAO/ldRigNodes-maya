@@ -22,6 +22,7 @@
 #include "nodesLib/ldRigCurveNode.h"
 #include "nodesLib/ldTwistNode.h"
 #include "nodesLib/ldFkIk2Bones.h"
+#include "nodesLib/ldRigComparaisonNode.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -54,6 +55,9 @@ MStatus initializePlugin(MObject obj)
     status = plugin.registerNode("ldRigFkIk2Bones", FkIk2Bones::id, &FkIk2Bones::creator, &FkIk2Bones::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
+    status = plugin.registerNode("ldRigComparaisonNode", RigComparaisonNode::id, &RigComparaisonNode::creator, &RigComparaisonNode::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
+
     return status;
 }
 
@@ -82,6 +86,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
 
     status = plugin.deregisterNode(FkIk2Bones::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+
+    status = plugin.deregisterNode(RigComparaisonNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
