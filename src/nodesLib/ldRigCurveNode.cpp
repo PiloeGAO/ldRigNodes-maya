@@ -103,10 +103,10 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
     {
         // Jump the array to the current controller.
         inControllersHandle.jumpToElement(i);
-
+        
         // Get the controller.
         MDataHandle controller = inControllersHandle.inputValue();
-
+        
         // Get the ik controller.
         ikControllersTrans[i] = MTransformationMatrix(controller.child(inIKController).asMatrix());
         controllersTangentScale[i] = (double) controller.child(inScaleTangent).asFloat();
@@ -142,7 +142,7 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
         curve.preCurve();
         curve.normalize();
     }
-    
+
     if(plug == outDeformers)
     {
         MArrayDataBuilder outArrayTranform = MArrayDataBuilder(outDeformers, curve.pointCount); //Obsolete but new constructor not work.
@@ -165,8 +165,6 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
         outTransformHandle.setClean();
 
         data.setClean(plug);
-    
-        return MS::kSuccess;
     } else
     { return MS::kUnknownParameter; }
     
