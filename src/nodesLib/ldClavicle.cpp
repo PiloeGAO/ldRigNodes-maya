@@ -17,6 +17,11 @@
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
 
+#include <maya/MVector.h>
+#include <maya/MQuaternion.h>
+#include <maya/MTransformationMatrix.h>
+#include <maya/MMatrix.h>
+
 #include "ldClavicle.h"
 
 MTypeId RigClavicle::id(0x01006);
@@ -41,10 +46,65 @@ MObject RigClavicle::outEndTrans;
 MStatus RigClavicle::compute(const MPlug& plug, MDataBlock& data)
 {
     MStatus returnStatus;
+
+    int alignAxis = getInt(data, inAlignAxis);
+    double rotationBlend = getFloat(data, inRotationBlend);
+    double restLength = getFloat(data, inRestLength);
+    int stretchable = getInt(data, inStretchable);
+    MTransformationMatrix pivotTrans = getMatrix(data, inPivotTrans);
+    MTransformationMatrix targetTrans = getMatrix(data, inTargetTrans);
+
+    MVector posA = pivotTrans.translation(MSpace::kWorld);
+    MQuaternion rotA = pivotTrans.rotation();
+    MVector posB = targetTrans.translation(MSpace::kWorld);
+    MQuaternion rotB = targetTrans.rotation();
+
+    MVector refAxis = getAxis(alignAxis);
+
+    MVector toTarget = posB - posA;
+    double currentLength = toTarget.length();
+    toTarget.normalize();
+
+    double endLength = restLength;
+
+    MQuaternion rotBlend = slerp(rotA, rotB, rotationBlend);
+    MVector orientedAxis = refAxis.rotateBy(rotBlend);
+    MQuaternion correctiveRot = orientedAxis.rotateTo(toTarget);
+    rotBlend *= correctiveRot;
+
+    MVector scale = MVector::one;
+
+    if(stretchable == 1)
+    {
+        double scaleFactor = currentLength / restLength;
+
+        if(alignAxis == 0 || alignAxis == 3) { scale.x = scaleFactor; }
+        else if(alignAxis == 1 || alignAxis == 4) { scale.y = scaleFactor; }
+        else if(alignAxis == 2 || alignAxis == 5) { scale.z = scaleFactor; }
+        endLength = currentLength;
+    }
+
+    MVector endPos = posA + toTarget * endLength;
+
+    MTransformationMatrix trans;
+    trans.setTranslation(posA, MSpace::kWorld);
+    trans.setRotationQuaternion(rotBlend.x, rotBlend.y, rotBlend.z, rotBlend.w);
+    double transScale[3] = {scale.x, scale.y, scale.z};
+    trans.setScale(transScale, MSpace::kWorld);
+
+    MTransformationMatrix endTrans;
+    endTrans.setTranslation(endPos, MSpace::kWorld);
+    endTrans.setRotationQuaternion(rotBlend.x, rotBlend.y, rotBlend.z, rotBlend.w);
     
     if(plug == outPivotTrans || plug == outEndTrans)
     {
-        return MS::kSuccess;
+        MDataHandle outPivotTransHandle = data.outputValue(outPivotTrans);
+        outPivotTransHandle.setMMatrix(trans.asMatrix());
+        outPivotTransHandle.setClean();
+
+        MDataHandle outEndTransHandle = data.outputValue(outEndTrans);
+        outEndTransHandle.setMMatrix(endTrans.asMatrix());
+        outEndTransHandle.setClean();
     } else {
         return MS::kUnknownParameter;
     }
