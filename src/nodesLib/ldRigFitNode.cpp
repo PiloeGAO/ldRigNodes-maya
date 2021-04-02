@@ -43,7 +43,32 @@ MStatus RigFitNode::compute(const MPlug& plug, MDataBlock& data)
 
     if(plug == outValue)
     {
-        return MS::kSuccess;
+        double value = getFloat(data, inValue);
+        double oldMin = getFloat(data, inOldMinValue);
+        double oldMax = getFloat(data, inOldMaxValue);
+        double newMin = getFloat(data, inNewMinValue);
+        double newMax = getFloat(data, inNewMaxValue);
+        int clamp = getInt(data, inClamp);
+
+        double result = ((value - oldMin)/(oldMax - oldMin)) * (newMax - newMin) + newMin;
+
+        if(clamp == 1)
+        {
+            if(newMax > newMin)
+            {
+                if(result < newMin) {result = newMin;}
+                else if (result > newMax) {result = newMax;}
+            }
+            else
+            {
+                if(result > newMin) {result = newMin;}
+                else if (result < newMax) {result = newMax;}
+            }
+        }
+
+        MDataHandle outValueHandle = data.outputValue(outValue);
+        outValueHandle.setFloat(result);
+        outValueHandle.setClean();
     } else {
         return MS::kUnknownParameter;
     }
@@ -76,13 +101,13 @@ MStatus RigFitNode::initialize()
     inOldMinValue = addInputFloatAttribute(stat, MString("oldMin"), MString("oldMin"), 0.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inOldMaxValue = addInputFloatAttribute(stat, MString("oldMax"), MString("oldMax"), 0.0);
+    inOldMaxValue = addInputFloatAttribute(stat, MString("oldMax"), MString("oldMax"), 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     inNewMinValue = addInputFloatAttribute(stat, MString("newMin"), MString("newMin"), 0.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inNewMaxValue = addInputFloatAttribute(stat, MString("newMax"), MString("newMax"), 0.0);
+    inNewMaxValue = addInputFloatAttribute(stat, MString("newMax"), MString("newMax"), 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     vector<MString> clampEnum = {MString("None"), MString("clamp")};
