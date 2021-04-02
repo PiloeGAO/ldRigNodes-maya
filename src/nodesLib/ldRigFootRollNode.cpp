@@ -17,6 +17,8 @@
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
 
+#include <maya/MAngle.h>
+
 #include "ldRigFootRollNode.h"
 
 MTypeId RigFootRollNode::id(0x01008);
@@ -37,6 +39,34 @@ MObject RigFootRollNode::outLeftAngle;
 MObject RigFootRollNode::outRightAngle;
 
 /**
+ * @brief Fit a value to a new cursor of values.
+ * 
+ * @param value     double Value to fit.
+ * @param oldMin    double Old minimum.
+ * @param oldMax    double Old maximum.
+ * @param newMin    double New minimum.
+ * @param newMax    double New maximum.
+ * @return          double Fitted value. 
+ */
+double RigFootRollNode::fit(double value, double oldMin, double oldMax, double newMin, double newMax)
+{
+    double result = ((value - oldMin) / (oldMax - oldMin)) * (newMax - newMin) + newMin;
+
+    if(newMax > newMin)
+    {
+        if(result < newMin) { result = newMin; }
+        else if(result > newMax) { result = newMax; }
+    }
+    else
+    {
+        if(result > newMin) { result = newMin; }
+        else if(result < newMax) { result = newMax; }
+    }
+
+    return result;
+}
+
+/**
  * @brief Compute the addition between float A and float B.
  * 
  * @param plug 
@@ -47,13 +77,69 @@ MStatus RigFootRollNode::compute(const MPlug& plug, MDataBlock& data)
 {
     MStatus returnStatus;
 
+    double footRoll = getAngle(data, inFootRoll).asDegrees();
+    double middleLimit = getAngle(data, inMiddleLimit).asDegrees();
+    double endLimit = getAngle(data, inEndLimit).asDegrees();
+    double heelLimit = getAngle(data, inHeelLimit).asDegrees();
+
+    double heelAngle = 0.0;
+    double middleAngle = 0.0;
+    double endAngle = 0.0;
+
+    if(footRoll >= 0.0)
+    {
+        middleAngle = footRoll;
+        if(footRoll > middleLimit)
+        {
+            endAngle = fit(footRoll, middleLimit, middleLimit+endLimit, 0.0, endLimit);
+            middleAngle = fit(footRoll, middleLimit, middleLimit+endLimit, middleLimit, 0.0);
+        }
+    }
+    else
+    {
+        heelAngle = footRoll;
+        if(heelAngle < heelLimit) { heelAngle = heelLimit; }
+    }
+
+    double sideRoll = getAngle(data, inSideRoll).asDegrees();
+    double leftLimit = getAngle(data, inLeftLimit).asDegrees();
+    double rightLimit = getAngle(data, inRightLimit).asDegrees();
+
+    double leftAngle = 0.0;
+    double rightAngle = 0.0;
+
+    if(sideRoll < 0.0)
+    {
+        leftAngle = fit(sideRoll, 0.0, leftLimit, 0.0, leftLimit);
+    }
+    else
+    {
+        rightAngle = fit(sideRoll, 0.0, rightLimit, 0.0, rightLimit);
+    }
+
     if(plug == outHeelAngle
         || plug == outMiddleAngle
         || plug == outEndAngle
         || plug == outLeftAngle
         || plug == outRightAngle)
     {
-        return MS::kSuccess;
+        MDataHandle outHeelAngleHandle = data.outputValue(outHeelAngle);
+        MDataHandle outMiddleAngleHandle = data.outputValue(outMiddleAngle);
+        MDataHandle outEndAngleHandle = data.outputValue(outEndAngle);
+        MDataHandle outLeftAngleHandle = data.outputValue(outLeftAngle);
+        MDataHandle outRightAngleHandle = data.outputValue(outRightAngle);
+
+        outHeelAngleHandle.setMAngle(MAngle(heelAngle, MAngle::kDegrees));
+        outMiddleAngleHandle.setMAngle(MAngle(middleAngle, MAngle::kDegrees));
+        outEndAngleHandle.setMAngle(MAngle(endAngle, MAngle::kDegrees));
+        outLeftAngleHandle.setMAngle(MAngle(leftAngle, MAngle::kDegrees));
+        outRightAngleHandle.setMAngle(MAngle(rightAngle, MAngle::kDegrees));
+
+        outHeelAngleHandle.setClean();
+        outMiddleAngleHandle.setClean();
+        outEndAngleHandle.setClean();
+        outLeftAngleHandle.setClean();
+        outRightAngleHandle.setClean();
     } else {
         return MS::kUnknownParameter;
     }

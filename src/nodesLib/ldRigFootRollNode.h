@@ -15,6 +15,8 @@ public:
     static void* creator();
     static MStatus initialize();
 
+    double fit(double value, double oldMin, double oldMax, double newMin, double newMax);
+
 public:
     static MTypeId id;
 
