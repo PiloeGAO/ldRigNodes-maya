@@ -24,6 +24,7 @@
 #include "nodesLib/ldRigComparaisonNode.h"
 #include "nodesLib/ldRigClavicle.h"
 #include "nodesLib/ldRigFitNode.h"
+#include "nodesLib/ldRigFootRollNode.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -61,6 +62,9 @@ MStatus initializePlugin(MObject obj)
     
     status = plugin.registerNode("ldRigFitNode", RigFitNode::id, &RigFitNode::creator, &RigFitNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
+    
+    status = plugin.registerNode("ldRigFootRollNode", RigFootRollNode::id, &RigFootRollNode::creator, &RigFootRollNode::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
 
     return status;
 }
@@ -96,6 +100,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
     
     status = plugin.deregisterNode(RigFitNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+    
+    status = plugin.deregisterNode(RigFootRollNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;

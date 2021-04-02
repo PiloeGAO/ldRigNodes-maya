@@ -9,6 +9,7 @@ set(SOURCE_FILES
     "nodesLib/ldRigComparaisonNode.cpp"
     "nodesLib/ldRigClavicle.cpp"
     "nodesLib/ldRigFitNode.cpp"
+    "nodesLib/ldRigFootRollNode.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)
