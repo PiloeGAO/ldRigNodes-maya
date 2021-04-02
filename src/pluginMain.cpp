@@ -17,13 +17,12 @@
 #include "pluginMain.h"
 
 /* Custom Nodes */
-#include "nodesLib/ldAddFloat.h"
-#include "nodesLib/ldBasicConstraint.h"
+#include "nodesLib/ldRigBasicConstraint.h"
 #include "nodesLib/ldRigCurveNode.h"
-#include "nodesLib/ldTwistNode.h"
-#include "nodesLib/ldFkIk2Bones.h"
+#include "nodesLib/ldRigTwistNode.h"
+#include "nodesLib/ldRigFkIk2Bones.h"
 #include "nodesLib/ldRigComparaisonNode.h"
-#include "nodesLib/ldClavicle.h"
+#include "nodesLib/ldRigClavicle.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -41,9 +40,6 @@ MStatus initializePlugin(MObject obj)
     MFnPlugin plugin(obj, PLUGIN_COMPANY, PLUGIN_VERSION, "Any");
 
     /* Loading Nodes. */
-    status = plugin.registerNode("ldAddFloat", AddFloat::id, &AddFloat::creator, &AddFloat::initialize);
-    if(!status) {status.perror("registerNode"); return status;}
-
     status = plugin.registerNode("ldBasicConstraint", BasicConstraint::id, &BasicConstraint::creator, &BasicConstraint::initialize);
     if(!status) {status.perror("registerNode"); return status;}
     
@@ -76,10 +72,7 @@ MStatus uninitializePlugin(MObject obj)
     MStatus status;
     MFnPlugin plugin(obj);
 
-    /* Unloading Nodes. */
-    status = plugin.deregisterNode(AddFloat::id);
-    if(!status) {status.perror("deregisterNode"); return status;}
-    
+    /* Unloading Nodes. */    
     status = plugin.deregisterNode(BasicConstraint::id);
     if(!status) {status.perror("deregisterNode"); return status;}
     

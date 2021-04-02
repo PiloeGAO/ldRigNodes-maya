@@ -22,7 +22,7 @@
 #include <maya/MQuaternion.h>
 #include <maya/MMatrix.h>
 
-#include "ldBasicConstraint.h"
+#include "ldRigBasicConstraint.h"
 
 MTypeId BasicConstraint::id(0x01001);
 

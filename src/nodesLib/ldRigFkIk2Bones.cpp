@@ -20,7 +20,7 @@
 #include <maya/MQuaternion.h>
 #include <maya/MMatrix.h>
 
-#include "ldFkIk2Bones.h"
+#include "ldRigFkIk2Bones.h"
 
 MTypeId FkIk2Bones::id(0x01004);
 

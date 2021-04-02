@@ -22,7 +22,7 @@
 #include <maya/MTransformationMatrix.h>
 #include <maya/MMatrix.h>
 
-#include "ldClavicle.h"
+#include "ldRigClavicle.h"
 
 MTypeId RigClavicle::id(0x01006);
 

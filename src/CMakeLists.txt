@@ -2,13 +2,12 @@ set(SOURCE_FILES
     "core/bezierCurve.cpp"
     "core/curve.cpp"
     "nodesLib/ldBaseRigNode.cpp"
-    "nodesLib/ldAddFloat.cpp"
-    "nodesLib/ldBasicConstraint.cpp"
+    "nodesLib/ldRigBasicConstraint.cpp"
     "nodesLib/ldRigCurveNode.cpp"
-    "nodesLib/ldTwistNode.cpp"
-    "nodesLib/ldFkIk2Bones.cpp"
+    "nodesLib/ldRigTwistNode.cpp"
+    "nodesLib/ldRigFkIk2Bones.cpp"
     "nodesLib/ldRigComparaisonNode.cpp"
-    "nodesLib/ldClavicle.cpp"
+    "nodesLib/ldRigClavicle.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)

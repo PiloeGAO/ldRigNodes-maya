@@ -22,7 +22,7 @@
 #include <maya/MQuaternion.h>
 #include <maya/MMatrix.h>
 
-#include "ldTwistNode.h"
+#include "ldRigTwistNode.h"
 
 MTypeId TwistNode::id(0x01003);
 
