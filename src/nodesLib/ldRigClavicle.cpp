@@ -1,9 +1,9 @@
 /**
- * @file ldClavicle.cpp
+ * @file ldRigClavicle.cpp
  * @author Leo DEPOIX (leonumerique@gmail.com)
  * @brief Register a clavicle node.
  * @version 0.1
- * @date 2021-01-28
+ * @date 2021-04-02
  * 
  * @copyright Copyright (c) 2021
  * 
