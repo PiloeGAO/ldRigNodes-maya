@@ -16,6 +16,7 @@
 #include <maya/MPlug.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
+#include <maya/MArrayDataHandle.h>
 
 #include <maya/MTransformationMatrix.h>
 #include <maya/MVector.h>
@@ -49,7 +50,92 @@ MStatus RigSpaceSwitchNode::compute(const MPlug& plug, MDataBlock& data)
     
     if(plug == outTransform)
     {
-        return MS::kSuccess;
+        MArrayDataHandle inSpacesHandle = data.inputArrayValue(inSpaces);
+        int spacesCount = inSpacesHandle.elementCount();
+
+        MTransformationMatrix parentMatrix = getMatrix(data, inParentMatrix);
+        MTransformationMatrix parentInverseMatrix = getMatrix(data, inParentInverseMatrix);
+
+        MVector finalPosition = parentMatrix.translation(MSpace::kWorld);
+        MQuaternion finalRotation = parentMatrix.rotation();
+        double finalScale[3];
+        parentMatrix.getScale(finalScale, MSpace::kWorld);
+
+        for (int i = 0; i < spacesCount; i++)
+        {
+            // Get space data from array.
+            inSpacesHandle.jumpToArrayElement(i);
+            MDataHandle spaceDatas = inSpacesHandle.inputValue();
+
+            // Get sub datas.
+            MMatrix spaceMatrix = spaceDatas.child(inSpaceMatrix).asMatrix();
+            MMatrix spaceOffset = spaceDatas.child(inSpaceOffset).asMatrix();
+            double spaceWeight = spaceDatas.child(inSpaceWeight).asFloat();
+            int spaceType = spaceDatas.child(inSpaceType).asInt();
+
+            // Compute world matrix.
+            MTransformationMatrix worldMatrix = MTransformationMatrix(spaceOffset * spaceMatrix);
+
+            MVector worldPosition = worldMatrix.translation(MSpace::kWorld);
+            MQuaternion worldRotation = worldMatrix.rotation();
+            double worldScale[3];
+            worldMatrix.getScale(worldScale, MSpace::kWorld);
+
+            // Compute using the spaceType selection.
+            if(spaceType == 0)
+            {
+                finalPosition = (worldPosition - finalPosition) * spaceWeight + finalPosition;
+                finalRotation = slerp(finalRotation, worldRotation, spaceWeight);
+                finalScale[0] = (worldScale[0] - finalScale[0]) * spaceWeight + finalScale[0];
+                finalScale[1] = (worldScale[1] - finalScale[1]) * spaceWeight + finalScale[1];
+                finalScale[2] = (worldScale[2] - finalScale[2]) * spaceWeight + finalScale[2];
+            }
+            else if (spaceType == 1)
+            {
+                finalPosition = (worldPosition - finalPosition) * spaceWeight + finalPosition;
+                finalScale[0] = (worldScale[0] - finalScale[0]) * spaceWeight + finalScale[0];
+                finalScale[1] = (worldScale[1] - finalScale[1]) * spaceWeight + finalScale[1];
+                finalScale[2] = (worldScale[2] - finalScale[2]) * spaceWeight + finalScale[2];
+            }
+            else if (spaceType == 2)
+            {
+                finalRotation = slerp(finalRotation, worldRotation, spaceWeight);
+                finalScale[0] = (worldScale[0] - finalScale[0]) * spaceWeight + finalScale[0];
+                finalScale[1] = (worldScale[1] - finalScale[1]) * spaceWeight + finalScale[1];
+                finalScale[2] = (worldScale[2] - finalScale[2]) * spaceWeight + finalScale[2];
+            }
+            else if (spaceType == 3)
+            {
+                finalPosition = (worldPosition - finalPosition) * spaceWeight + finalPosition;
+                finalRotation = slerp(finalRotation, worldRotation, spaceWeight);
+            }
+            else if (spaceType == 4)
+            {
+                finalScale[0] = (worldScale[0] - finalScale[0]) * spaceWeight + finalScale[0];
+                finalScale[1] = (worldScale[1] - finalScale[1]) * spaceWeight + finalScale[1];
+                finalScale[2] = (worldScale[2] - finalScale[2]) * spaceWeight + finalScale[2];
+            }
+            else if (spaceType == 5)
+            {
+                finalRotation = slerp(finalRotation, worldRotation, spaceWeight);
+            }
+            else if (spaceType == 6)
+            {
+                finalPosition = (worldPosition - finalPosition) * spaceWeight + finalPosition;
+            }
+        }
+
+        MTransformationMatrix finalTransform;
+        finalTransform.setTranslation(finalPosition, MSpace::kWorld);
+        finalTransform.setRotationQuaternion(finalRotation.x, finalRotation.y, finalRotation.z, finalRotation.w);
+        finalTransform.setScale(finalScale, MSpace::kWorld);
+        
+        MMatrix tranform = finalTransform.asMatrix() * parentInverseMatrix.asMatrix();
+
+        MDataHandle outTransformHandle = data.outputValue(outTransform);
+
+        outTransformHandle.setMMatrix(tranform);
+        outTransformHandle.setClean();
     } else {
         return MS::kUnknownParameter;
     }
