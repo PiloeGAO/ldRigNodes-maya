@@ -25,6 +25,7 @@
 #include "nodesLib/ldRigClavicle.h"
 #include "nodesLib/ldRigFitNode.h"
 #include "nodesLib/ldRigFootRollNode.h"
+#include "nodesLib/ldRigSpaceSwitchNode.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -65,6 +66,9 @@ MStatus initializePlugin(MObject obj)
     
     status = plugin.registerNode("ldRigFootRollNode", RigFootRollNode::id, &RigFootRollNode::creator, &RigFootRollNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
+    
+    status = plugin.registerNode("ldRigSpaceSwitchNode", RigSpaceSwitchNode::id, &RigSpaceSwitchNode::creator, &RigSpaceSwitchNode::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
 
     return status;
 }
@@ -103,6 +107,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
     
     status = plugin.deregisterNode(RigFootRollNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+    
+    status = plugin.deregisterNode(RigSpaceSwitchNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
