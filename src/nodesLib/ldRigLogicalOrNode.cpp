@@ -1,7 +1,7 @@
 /**
  * @file ldRigLogicalOrNode.cpp
  * @author Leo DEPOIX (leonumerique@gmail.com)
- * @brief Register a logical "and" node.
+ * @brief Register a logical "or" node.
  * @version 0.1
  * @date 2021-01-28
  * 

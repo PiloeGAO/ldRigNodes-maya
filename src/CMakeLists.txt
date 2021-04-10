@@ -13,6 +13,7 @@ set(SOURCE_FILES
     "nodesLib/ldRigSpaceSwitchNode.cpp"
     "nodesLib/ldRigLogicalAndNode.cpp"
     "nodesLib/ldRigLogicalOrNode.cpp"
+    "nodesLib/ldRigSelectCasesNode.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)
