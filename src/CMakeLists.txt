@@ -12,6 +12,7 @@ set(SOURCE_FILES
     "nodesLib/ldRigFootRollNode.cpp"
     "nodesLib/ldRigSpaceSwitchNode.cpp"
     "nodesLib/ldRigLogicalAndNode.cpp"
+    "nodesLib/ldRigLogicalOrNode.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)
