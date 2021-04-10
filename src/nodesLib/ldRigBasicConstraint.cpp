@@ -86,7 +86,6 @@ void* BasicConstraint::creator()
  */
 MStatus BasicConstraint::initialize()
 {
-    MFnMatrixAttribute matAttribFn;
     MStatus stat;
 
     inTransform = addInputMatrixAttribute(stat, MString("inTranform"), MString("inTrans"));

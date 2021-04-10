@@ -26,6 +26,7 @@
 #include "nodesLib/ldRigFitNode.h"
 #include "nodesLib/ldRigFootRollNode.h"
 #include "nodesLib/ldRigSpaceSwitchNode.h"
+#include "nodesLib/ldRigLogicalAndNode.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -69,6 +70,9 @@ MStatus initializePlugin(MObject obj)
     
     status = plugin.registerNode("ldRigSpaceSwitchNode", RigSpaceSwitchNode::id, &RigSpaceSwitchNode::creator, &RigSpaceSwitchNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
+    
+    status = plugin.registerNode("ldRigLogicalAndNode", RigLogicalAndNode::id, &RigLogicalAndNode::creator, &RigLogicalAndNode::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
 
     return status;
 }
@@ -110,6 +114,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
     
     status = plugin.deregisterNode(RigSpaceSwitchNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+    
+    status = plugin.deregisterNode(RigLogicalAndNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
