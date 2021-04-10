@@ -48,11 +48,48 @@ MStatus RigLogicalAndNode::compute(const MPlug& plug, MDataBlock& data)
     
     if(plug == outValue)
     {
-        return MS::kSuccess;
+        int comparaisonType = getInt(data, inComparaisonType);
+        double secondTerm = getFloat(data, inSecondTerm);
+        double trueValue = getFloat(data, inTrueValue);
+        double falseValue = getFloat(data, inFalseValue);
+
+        MArrayDataHandle inValueHandle = data.inputArrayValue(inValues);
+        int valuesCount = inValueHandle.elementCount();
+
+        double value = trueValue;
+
+        for (int i = 0; i < valuesCount; i++)
+        {
+            inValueHandle.jumpToElement(i);
+
+            // Get the case datas.
+            MDataHandle valueDatas = inValueHandle.inputValue();
+
+            //Get the case value.
+            double firstTerm = valueDatas.child(inValue).asFloat();
+            bool isTrue = false;
+
+            if(comparaisonType == 0 && firstTerm == secondTerm) { isTrue = true; }
+            else if (comparaisonType == 1 && firstTerm != secondTerm) { isTrue = true; }
+            else if (comparaisonType == 2 && firstTerm > secondTerm) { isTrue = true; }
+            else if (comparaisonType == 3 && firstTerm >= secondTerm) { isTrue = true; }
+            else if (comparaisonType == 4 && firstTerm < secondTerm) { isTrue = true; }
+            else if (comparaisonType == 5 && firstTerm <= secondTerm) { isTrue = true; }
+
+            if(!isTrue)
+            {
+                value = falseValue;
+                break;
+            }
+        }
+
+        MDataHandle outValueHandle = data.outputValue(outValue);
+        outValueHandle.setFloat(value);
+        outValueHandle.setClean();
+        
     } else {
         return MS::kUnknownParameter;
     }
-    
     return MS::kSuccess;
 }
 
