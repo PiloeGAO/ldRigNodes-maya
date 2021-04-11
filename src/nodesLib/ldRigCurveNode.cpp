@@ -268,10 +268,10 @@ MStatus RigCurveNode::initialize()
     inStretchProfil = addInputRampAttribute(stat, MString("stretchProfil"), MString("strchProfil"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inSquatchAxis0Scale = addInputFloatAttribute(stat, MString("squatchAxis0Scale"), MString("sqtchAxis0Scl"), 0.5);
+    inSquatchAxis0Scale = addInputFloatAttribute(stat, MString("squatchAxis0Scale"), MString("sqtchAxis0Scl"), 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inSquatchAxis1Scale = addInputFloatAttribute(stat, MString("squatchAxis1Scale"), MString("sqtchAxis1Scl"), 0.5);
+    inSquatchAxis1Scale = addInputFloatAttribute(stat, MString("squatchAxis1Scale"), MString("sqtchAxis1Scl"), 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     inSquatchProfil = addInputRampAttribute(stat, MString("squatchProfil"), MString("sqtchProfil"));
