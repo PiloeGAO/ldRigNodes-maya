@@ -19,6 +19,74 @@
 
 using namespace std;
 
+/**
+ * @brief Blends between matrix A and B.
+ * 
+ * @param matrixA   MTransformationMatrix   Matrix A.
+ * @param matrixB   MTransformationMatrix   Matrix B.
+ * @param blend     double                  Blend factor.
+ * @return          MTransformationMatrix   The result matrix.
+ */
+MTransformationMatrix Curve::blendTransform(MTransformationMatrix matrixA, MTransformationMatrix matrixB, double blend)
+{
+    // Split the datas.
+    MVector aPos = matrixA.translation(MSpace::kWorld);
+    MQuaternion aRot = matrixA.rotation();
+    double aScl[3];
+    matrixA.getScale(aScl, MSpace::kWorld);
+
+
+    MVector bPos = matrixB.translation(MSpace::kWorld);
+    MQuaternion bRot = matrixB.rotation();
+    double bScl[3];
+    matrixB.getScale(bScl, MSpace::kWorld);
+
+    // Compute the result matrix.
+    MVector rPos = (bPos - aPos) * blend + aPos;
+    MQuaternion rRot = slerp(aRot, bRot, blend);
+    double rScl[3];
+    rScl[0] = (bScl[0] - aScl[0]) * blend + aScl[0];
+    rScl[1] = (bScl[1] - aScl[1]) * blend + aScl[1];
+    rScl[2] = (bScl[2] - aScl[2]) * blend + aScl[2];
+
+    // Build the result matrix.
+    MTransformationMatrix matrixR;
+    matrixR.setTranslation(rPos, MSpace::kWorld);
+    matrixR.setRotationQuaternion(rRot.x, rRot.y, rRot.z, rRot.w);
+    matrixR.setScale(rScl, MSpace::kWorld);
+
+    return matrixR;
+}
+
+/**
+ * @brief Compute the controllers positions from fkIkBlend factor.
+ * 
+ */
+void Curve::blendFKIKControllers()
+{
+    for(int i; i < controllers.size(); i++)
+    {
+        if(fkIkBlend == 1.0)
+        {
+            controllers[i] = controllersIK[i];
+            controllersTangent0[i] = controllersIKTangent0[i];
+            controllersTangent1[i] = controllersIKTangent1[i];
+        }
+        else if(fkIkBlend == 0.0)
+        {
+            controllers[i] = controllersFK[i];
+            controllersTangent0[i] = controllersFKTangent0[i];
+            controllersTangent1[i] = controllersFKTangent1[i];
+        }
+        else
+        {
+            controllers[i] = blendTransform(controllersFK[i], controllersIK[i], fkIkBlend);
+            controllersTangent0[i] = blendTransform(controllersFKTangent0[i], controllersIKTangent0[i], fkIkBlend);
+            controllersTangent1[i] = blendTransform(controllersFKTangent1[i], controllersIKTangent1[i], fkIkBlend);
+        }
+    }
+}
+
 void Curve::firstSubCurveTangent(MVector c0, MVector c1, MVector c2, double c0ScaleTan, double c1ScaleTan)
 {
     /* Compute the vector and length between the controller 0 and 1. */
@@ -85,34 +153,103 @@ void Curve::preCurve()
     {
         if(iCrv == 0)
         {
-            firstSubCurveTangent(
-                controllers[0].translation(MSpace::kWorld),
-                controllers[1].translation(MSpace::kWorld),
-                controllers[2].translation(MSpace::kWorld),
-                controllersTanScl[0],
-                controllersTanScl[1]
-            );
+            if(tangentMode == 0)
+            {
+                firstSubCurveTangent(
+                    controllers[0].translation(MSpace::kWorld),
+                    controllers[1].translation(MSpace::kWorld),
+                    controllers[2].translation(MSpace::kWorld),
+                    controllersTanScl[0],
+                    controllersTanScl[1]
+                );
+            }
+            else
+            {
+                subCurveControllers[0] = controllers[0].translation(MSpace::kWorld);
+                subCurveControllers[1] = controllersTangent0[0].translation(MSpace::kWorld);
+                subCurveControllers[2] = controllersTangent1[0].translation(MSpace::kWorld);
+                subCurveControllers[3] = controllers[1].translation(MSpace::kWorld);
+            }
+
+            // Get the controller rotation.
+            subCurveControllersRots[0] = controllers[0].rotation();
+            subCurveControllersRots[1] = controllers[1].rotation();
+
+            // Get the controller scale.
+            double subCurveControllersScls0[3];
+            controllers[0].getScale(subCurveControllersScls0, MSpace::kWorld);
+            subCurveControllersScls[0] = MVector(subCurveControllersScls0);
+
+            double subCurveControllersScls1[3];
+            controllers[1].getScale(subCurveControllersScls1, MSpace::kWorld);
+            subCurveControllersScls[1] = MVector(subCurveControllersScls1);
         }
         else if(iCrv == subCrvCount - 1)
         {
-            lastSubCurveTangent(
-                controllers[controllers.capacity()-3].translation(MSpace::kWorld),
-                controllers[controllers.capacity()-2].translation(MSpace::kWorld),
-                controllers[controllers.capacity()-1].translation(MSpace::kWorld),
-                controllersTanScl[controllersTanScl.capacity()-2],
-                controllersTanScl[controllersTanScl.capacity()-1]
-            );
+            if(tangentMode == 0)
+            {
+                lastSubCurveTangent(
+                    controllers[controllers.capacity()-3].translation(MSpace::kWorld),
+                    controllers[controllers.capacity()-2].translation(MSpace::kWorld),
+                    controllers[controllers.capacity()-1].translation(MSpace::kWorld),
+                    controllersTanScl[controllersTanScl.capacity()-2],
+                    controllersTanScl[controllersTanScl.capacity()-1]
+                );
+            }
+            else
+            {
+                subCurveControllers[0] = controllers[controllers.capacity()-2].translation(MSpace::kWorld);
+                subCurveControllers[1] = controllersTangent0[controllersTangent0.capacity()-2].translation(MSpace::kWorld);
+                subCurveControllers[2] = controllersTangent1[controllersTangent1.capacity()-2].translation(MSpace::kWorld);
+                subCurveControllers[3] = controllers[controllers.capacity()-1].translation(MSpace::kWorld);
+            }
+
+            // Get the controller rotation.
+            subCurveControllersRots[0] = controllers[controllers.capacity()-2].rotation();
+            subCurveControllersRots[1] = controllers[controllers.capacity()-1].rotation();
+
+            // Get the controller scale.
+            double subCurveControllersScls0[3];
+            controllers[controllers.capacity()-2].getScale(subCurveControllersScls0, MSpace::kWorld);
+            subCurveControllersScls[0] = MVector(subCurveControllersScls0);
+
+            double subCurveControllersScls1[3];
+            controllers[controllers.capacity()-1].getScale(subCurveControllersScls1, MSpace::kWorld);
+            subCurveControllersScls[1] = MVector(subCurveControllersScls1);
         }
         else
         {
-            middleSubCurveTangent(
-                controllers[iCrv-1].translation(MSpace::kWorld),
-                controllers[iCrv].translation(MSpace::kWorld),
-                controllers[iCrv+1].translation(MSpace::kWorld),
-                controllers[iCrv+2].translation(MSpace::kWorld),
-                controllersTanScl[iCrv],
-                controllersTanScl[iCrv+1]
-            );
+            if(tangentMode == 0)
+            {
+                middleSubCurveTangent(
+                    controllers[iCrv-1].translation(MSpace::kWorld),
+                    controllers[iCrv].translation(MSpace::kWorld),
+                    controllers[iCrv+1].translation(MSpace::kWorld),
+                    controllers[iCrv+2].translation(MSpace::kWorld),
+                    controllersTanScl[iCrv],
+                    controllersTanScl[iCrv+1]
+                );
+            }
+            else
+            {
+                subCurveControllers[0] = controllers[iCrv].translation(MSpace::kWorld);
+                subCurveControllers[1] = controllersTangent0[iCrv].translation(MSpace::kWorld);
+                subCurveControllers[2] = controllersTangent1[iCrv].translation(MSpace::kWorld);
+                subCurveControllers[3] = controllers[iCrv+1].translation(MSpace::kWorld);
+            }
+
+            // Get the controller rotation.
+            subCurveControllersRots[0] = controllers[iCrv].rotation();
+            subCurveControllersRots[1] = controllers[iCrv+1].rotation();
+
+            // Get the controller scale.
+            double subCurveControllersScls0[3];
+            controllers[iCrv].getScale(subCurveControllersScls0, MSpace::kWorld);
+            subCurveControllersScls[0] = MVector(subCurveControllersScls0);
+
+            double subCurveControllersScls1[3];
+            controllers[iCrv+1].getScale(subCurveControllersScls1, MSpace::kWorld);
+            subCurveControllersScls[1] = MVector(subCurveControllersScls1);
         }
 
         // Compute the sub curve point positions.
@@ -136,6 +273,13 @@ void Curve::preCurve()
                 subCurveControllers[3],
                 t
             );
+
+            preCrvPntCtrlStartID[pointID] = subCurveControllersIDs[0];
+            preCrvPntCtrlEndID[pointID] = subCurveControllersIDs[1];
+            preCrvPntSubCurveU[pointID] = t;
+
+            preCrvPntRots[pointID] = slerp(subCurveControllersRots[0],subCurveControllersRots[1], t);
+            preCrvPntScls[pointID] = (subCurveControllersScls[1] - subCurveControllersScls[0]) * t + subCurveControllersScls[0];
             
             // Defining points.
             MVector preCrvPntPosisPID = preCrvPntPosis[pointID];
@@ -235,12 +379,40 @@ void Curve::normalize()
             MVector maxPointTans = preCrvPntTans[maxID];
             MVector minPointTans = preCrvPntTans[minID];
             crvPntTans[iPnt] = (maxPointTans - minPointTans) * blend + preCrvPntTans[minID];
+
+            if(preCrvPntSubCurveU[minID] > preCrvPntSubCurveU[maxID]) { crvPntSubCurveU[iPnt] = (1.0 - preCrvPntSubCurveU[minID]) * blend + preCrvPntSubCurveU[minID]; }
+            else { crvPntSubCurveU[iPnt] = (preCrvPntSubCurveU[maxID] - preCrvPntSubCurveU[minID]) * blend + preCrvPntSubCurveU[minID]; }
         
             MVector lastControllersPosis = controllers[controllers.capacity()-1].translation(MSpace::kWorld);
             MVector currentCurvePoint = crvPntPosis[iPnt];
             lastInCrvPntTan = (lastControllersPosis - currentCurvePoint).normal();
             lastInCrvPntPos = crvPntPosis[iPnt];
             lastInCrvPntDist = pointDist;
+
+            if(twistMode == 1)
+            {
+                pointRotation(
+                    preCrvPntRots[minID],
+                    preCrvPntRots[maxID],
+                    crvPntTans[iPnt],
+                    blend,
+                    iPnt,
+                    alignAxis
+                );
+            }
+
+            crvPntScls[iPnt] = MVector::one;
+            if(scaleMode == 1)
+            {
+                double preCrvPntSclsMinID[3] = {preCrvPntScls[minID].x, preCrvPntScls[minID].y, preCrvPntScls[minID].z};
+                double preCrvPntSclsMaxID[3] = {preCrvPntScls[maxID].x, preCrvPntScls[maxID].y, preCrvPntScls[maxID].z};
+                pointScale(
+                    preCrvPntSclsMinID,
+                    preCrvPntSclsMaxID,
+                    blend,
+                    iPnt
+                );
+            }
         }
         // Extend the curve with the last point tangent.
         else
@@ -250,14 +422,17 @@ void Curve::normalize()
             crvPntTans[iPnt] = lastInCrvPntTan;
         }
         
-        pointRotation(
-            controllers[0].rotation(),
-            controllers[controllers.capacity()-1].rotation(),
-            crvPntTans[iPnt],
-            pointU,
-            iPnt,
-            alignAxis
-        );
+        if(twistMode == 0)
+        {
+            pointRotation(
+                controllers[0].rotation(),
+                controllers[controllers.capacity()-1].rotation(),
+                crvPntTans[iPnt],
+                pointU,
+                iPnt,
+                alignAxis
+            );
+        }
 
         double controller0Scale[3];
         controllers[0].getScale(controller0Scale, MSpace::kWorld);
@@ -265,12 +440,15 @@ void Curve::normalize()
         double controllerLastScale[3];
         controllers[controllers.capacity()-1].getScale(controllerLastScale, MSpace::kWorld);
 
-        pointScale(
-            controller0Scale,
-            controllerLastScale,
-            pointU,
-            iPnt
-        );
+        if(scaleMode == 0)
+        {
+            pointScale(
+                controller0Scale,
+                controllerLastScale,
+                pointU,
+                iPnt
+            );
+        }
 
         if(stretchNSquatchMode)
         {
