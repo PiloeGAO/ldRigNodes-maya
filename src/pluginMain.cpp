@@ -29,6 +29,7 @@
 #include "nodesLib/ldRigLogicalAndNode.h"
 #include "nodesLib/ldRigLogicalOrNode.h"
 #include "nodesLib/ldRigSelectCasesNode.h"
+#include "nodesLib/ldRigIkPlane.h"
 
 /* Setup defines */
 #define PLUGIN_COMPANY "Leo DEPOIX"
@@ -81,6 +82,9 @@ MStatus initializePlugin(MObject obj)
     
     status = plugin.registerNode("ldRigSelectCasesNode", RigSelectCasesNode::id, &RigSelectCasesNode::creator, &RigSelectCasesNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
+    
+    status = plugin.registerNode("ldRigIkPlaneNode", RigIkPlane::id, &RigIkPlane::creator, &RigIkPlane::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
 
     return status;
 }
@@ -131,6 +135,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
     
     status = plugin.deregisterNode(RigSelectCasesNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+    
+    status = plugin.deregisterNode(RigIkPlane::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
