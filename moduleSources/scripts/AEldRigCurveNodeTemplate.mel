@@ -1,7 +1,7 @@
 // Original file from Guillaume Baratte.
 global proc AEldRigCurveNodeTemplate( string $nodeName )
 {
-    // Add the Scroll Layout.
+// Add the Scroll Layout.
     editorTemplate -beginScrollLayout;
 
         // Add the curve options Layout.
@@ -9,10 +9,12 @@ global proc AEldRigCurveNodeTemplate( string $nodeName )
 
             editorTemplate -label "Deformer Count" -addControl "deformerCount";
             editorTemplate -label "Curve Rest Length" -addControl "curveRestLength";
-            editorTemplate -label "Controllers Rest Distance" -addControl "controllerRestDistance";
+            editorTemplate -label "Controllers Rest Distance" -addControl "contollersRestDistance";
             editorTemplate -label "Fk Ik Blend" -addControl "fkIkBlend";
             editorTemplate -label "Stretchable" -addControl "stretchable";
             editorTemplate -label "Limit Stretch" -addControl "limitStretch";
+            editorTemplate -label "Tangent Mode" -addControl "tangentMode";
+            editorTemplate -label "Scale Mode" -addControl "scaleMode";
 
         editorTemplate -endLayout;
 
@@ -103,6 +105,4 @@ global proc AEldRigCurveNodeTemplate( string $nodeName )
     setAttr( $nodeName+".squatchProfil[2].squatchProfil_FloatValue") 0.0;
     setAttr( $nodeName+".squatchProfil[2].squatchProfil_Position") 1.0;
     setAttr( $nodeName+".squatchProfil[2].squatchProfil_Interp") 2;
-
-
 }

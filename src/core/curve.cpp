@@ -64,7 +64,7 @@ MTransformationMatrix Curve::blendTransform(MTransformationMatrix matrixA, MTran
  */
 void Curve::blendFKIKControllers()
 {
-    for(int i; i < controllers.size(); i++)
+    for(int i = 0; i < controllers.size(); i++)
     {
         if(fkIkBlend == 1.0)
         {
@@ -605,10 +605,16 @@ double Curve::length()
  * @brief Add controllers to the curve.
  * 
  * @param inControllers vector<MTransformationMatrix> List of controllers.
+ * @param inTangent0    vector<MTransformationMatrix> List of tangents.
+ * @param inTangent1    vector<MTransformationMatrix> List of tangents.
  */
-void Curve::addControllers(vector<MTransformationMatrix> inControllers)
+void Curve::addControllers(vector<MTransformationMatrix> inControllers,
+                            vector<MTransformationMatrix> inTangent0,
+                            vector<MTransformationMatrix> inTangent1)
 {
     controllers = inControllers;
+    controllersTangent0 = inTangent0;
+    controllersTangent1 = inTangent1;
 }
 
 /**
@@ -619,6 +625,38 @@ void Curve::addControllers(vector<MTransformationMatrix> inControllers)
 void Curve::addControllersTanScl(vector<double> inControllersTanScl)
 {
     controllersTanScl = inControllersTanScl;
+}
+
+/**
+ * @brief Add IK controllers to the curve.
+ * 
+ * @param inControllers vector<MTransformationMatrix> List of controllers.
+ * @param inTangent0    vector<MTransformationMatrix> List of tangents.
+ * @param inTangent1    vector<MTransformationMatrix> List of tangents.
+ */
+void Curve::addIKControllers(vector<MTransformationMatrix> inControllers,
+                             vector<MTransformationMatrix> inTangent0,
+                             vector<MTransformationMatrix> inTangent1)
+{
+    controllersIK = inControllers;
+    controllersIKTangent0 = inTangent0;
+    controllersIKTangent1 = inTangent1;
+}
+
+/**
+ * @brief Add FK controllers to the curve.
+ * 
+ * @param inControllers vector<MTransformationMatrix> List of controllers.
+ * @param inTangent0    vector<MTransformationMatrix> List of tangents.
+ * @param inTangent1    vector<MTransformationMatrix> List of tangents.
+ */
+void Curve::addFKControllers(vector<MTransformationMatrix> inControllers,
+                             vector<MTransformationMatrix> inTangent0,
+                             vector<MTransformationMatrix> inTangent1)
+{
+    controllersFK = inControllers;
+    controllersFKTangent0 = inTangent0;
+    controllersFKTangent1 = inTangent1;
 }
 
 /**

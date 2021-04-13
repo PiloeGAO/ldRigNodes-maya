@@ -25,7 +25,15 @@ public:
     double fit(double value, double oldMin, double oldMax, double newMin, double newMax);
     void pointStretchNSquatch(double t, int pointID, MVector firstControllerPos, MVector lastControllerPos, int alignAxis=1);
     
-    void addControllers(vector<MTransformationMatrix> controllers);
+    void addControllers(vector<MTransformationMatrix> controllers,
+                            vector<MTransformationMatrix> inTangent0,
+                            vector<MTransformationMatrix> inTangent1);
+    void addIKControllers(vector<MTransformationMatrix> controllers,
+                            vector<MTransformationMatrix> inTangent0,
+                            vector<MTransformationMatrix> inTangent1);
+    void addFKControllers(vector<MTransformationMatrix> controllers,
+                            vector<MTransformationMatrix> inTangent0,
+                            vector<MTransformationMatrix> inTangent1);
     void addControllersTanScl(vector<double> controllersTanScl);
 
     MVector getPointPosis(int pointID);

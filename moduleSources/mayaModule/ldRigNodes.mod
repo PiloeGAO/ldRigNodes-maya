@@ -1,0 +1,1 @@
++ MAYAVERSION:2020 PLATFORM:win64 ldRigNodes 0.1.0 ..\

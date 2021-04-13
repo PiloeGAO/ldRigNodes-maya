@@ -56,9 +56,14 @@ public:
     static MObject inSquatchProfil;
 
     // Controllers parameters.
+    static MObject inTangentMode;
     static MObject inControllers;
     static MObject inIKController;
+    static MObject inIKTangent0;
+    static MObject inIKTangent1;
     static MObject inFKController;
+    static MObject inFKTangent0;
+    static MObject inFKTangent1;
     static MObject inPrevTangent;
     static MObject inNextTangent;
     static MObject inScaleTangent;

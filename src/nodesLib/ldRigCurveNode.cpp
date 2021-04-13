@@ -62,9 +62,14 @@ MObject RigCurveNode::inSquatchAxis1Scale;
 MObject RigCurveNode::inSquatchProfil;
 
 // Controllers parameters.
+MObject RigCurveNode::inTangentMode;
 MObject RigCurveNode::inControllers;
 MObject RigCurveNode::inIKController;
+MObject RigCurveNode::inIKTangent0;
+MObject RigCurveNode::inIKTangent1;
 MObject RigCurveNode::inFKController;
+MObject RigCurveNode::inFKTangent0;
+MObject RigCurveNode::inFKTangent1;
 MObject RigCurveNode::inPrevTangent;
 MObject RigCurveNode::inNextTangent;
 MObject RigCurveNode::inScaleTangent;
@@ -96,6 +101,11 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
 
     // Define the array list of ik controllers.
     vector<MTransformationMatrix> ikControllersTrans = vector<MTransformationMatrix> (controllersCount);
+    vector<MTransformationMatrix> fkControllersTrans = vector<MTransformationMatrix> (controllersCount);
+    vector<MTransformationMatrix> ikTan0Trans = vector<MTransformationMatrix> (controllersCount);
+    vector<MTransformationMatrix> ikTan1Trans = vector<MTransformationMatrix> (controllersCount);
+    vector<MTransformationMatrix> fkTan0Trans = vector<MTransformationMatrix> (controllersCount);
+    vector<MTransformationMatrix> fkTan1Trans = vector<MTransformationMatrix> (controllersCount);
     vector<double> controllersTangentScale = vector<double> (controllersCount);
 
     // Loop over the controller count.
@@ -109,6 +119,11 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
         
         // Get the ik controller.
         ikControllersTrans[i] = MTransformationMatrix(controller.child(inIKController).asMatrix());
+        fkControllersTrans[i] = MTransformationMatrix(controller.child(inFKController).asMatrix());
+        ikTan0Trans[i] = MTransformationMatrix(controller.child(inIKTangent0).asMatrix());
+        ikTan1Trans[i] = MTransformationMatrix(controller.child(inIKTangent1).asMatrix());
+        fkTan0Trans[i] = MTransformationMatrix(controller.child(inFKTangent0).asMatrix());
+        fkTan1Trans[i] = MTransformationMatrix(controller.child(inFKTangent1).asMatrix());
         controllersTangentScale[i] = (double) controller.child(inScaleTangent).asFloat();
     }
     
@@ -131,12 +146,20 @@ MStatus RigCurveNode::compute(const MPlug& plug, MDataBlock& data)
         curve.squatchAxis0Scale = getFloat(data, inSquatchAxis0Scale);
         curve.squatchAxis1Scale = getFloat(data, inSquatchAxis1Scale);
         curve.distributionRamp = MRampAttribute(thisMObject(), inDistributionProfil);
+        curve.twistMode = getInt(data, inTwistMode);
         curve.twistRamp = MRampAttribute(thisMObject(), inTwistProfil);
+        curve.scaleMode = getInt(data, inScaleMode);
         curve.stretchRamp = MRampAttribute(thisMObject(), inStretchProfil);
         curve.squatchRamp = MRampAttribute(thisMObject(), inSquatchProfil);
         curve.stretchNSquatchMode = (bool) getInt(data, inSNSMode);
-        curve.addControllers(ikControllersTrans);
+        curve.fkIkBlend = getFloat(data, inFKIKBlend);
+
+        curve.addControllers(ikControllersTrans, ikTan0Trans, ikTan1Trans);
         curve.addControllersTanScl(controllersTangentScale);
+        curve.addIKControllers(ikControllersTrans, ikTan0Trans, ikTan1Trans);
+        curve.addFKControllers(fkControllersTrans, fkTan0Trans, fkTan1Trans);
+
+        curve.tangentMode = getInt(data, inTangentMode);
 
         // Compute the curve.
         curve.preCurve();
@@ -221,7 +244,7 @@ MStatus RigCurveNode::initialize()
     if(!stat) {stat.perror("addAttribute"); return stat;}
         
     // Twist parameters.
-    vector<MString> twistModes = {MString("First And Last")};
+    vector<MString> twistModes = {MString("First And Last"), MString("All")};
     inTwistMode = addInputEnumAttribute(stat, MString("twistMode"), MString("twistMode"), 0, twistModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
@@ -233,7 +256,7 @@ MStatus RigCurveNode::initialize()
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     // Scale parameters.
-    vector<MString> scaleModes = {MString("First And Last")};
+    vector<MString> scaleModes = {MString("First And Last"), MString("All")};
     inScaleMode = addInputEnumAttribute(stat, MString("scaleMode"), MString("scaleMode"), 0, scaleModes);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
@@ -279,14 +302,29 @@ MStatus RigCurveNode::initialize()
 
     // Controllers parameters.
     inIKController = addInputMatrixAttribute(stat, MString("ikController"), MString("ikCtrl"), false);
+    inIKTangent0 = addInputMatrixAttribute(stat, MString("ikTangent0"), MString("ikTan0"), false);
+    inIKTangent1 = addInputMatrixAttribute(stat, MString("ikTangent1"), MString("ikTan1"), false);
     inFKController = addInputMatrixAttribute(stat, MString("fkController"), MString("fkCtrl"), false);
-    inPrevTangent = addInputMatrixAttribute(stat, MString("prevTangent"), MString("pTan"), false);
-    inNextTangent = addInputMatrixAttribute(stat, MString("nextTangent"), MString("nTan"), false);
+    inFKTangent0 = addInputMatrixAttribute(stat, MString("fkTangent0"), MString("fkTan0"), false);
+    inFKTangent1 = addInputMatrixAttribute(stat, MString("fkTangent1"), MString("fkTan1"), false);
 
     inScaleTangent = addInputFloatAttribute(stat, MString("scaleTangent"), MString("sclTan"), 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
-    vector<MObject> controllerAttributes = {inIKController, inFKController, inPrevTangent, inNextTangent, inScaleTangent};
+    vector<MString> tangentModeEnum = {MString("automatic"), MString("user")};
+    inTangentMode = addInputEnumAttribute(stat, MString("tangentMode"), MString("tanMode"), 0, tangentModeEnum);
+    if(!stat) {stat.perror("addAttribute"); return stat;}
+    
+    vector<MObject> controllerAttributes = {
+        inIKController,
+        inIKTangent0,
+        inIKTangent1,
+        inFKController,
+        inFKTangent0,
+        inFKTangent1,
+        inScaleTangent
+    };
+
     inControllers = addInputCompoundAttribute(stat, MString("controllers"), MString("ctrls"), controllerAttributes, true);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
@@ -329,6 +367,8 @@ MStatus RigCurveNode::initialize()
                                 inSquatchAxis0Scale,
                                 inSquatchAxis1Scale,
                                 inSquatchProfil,
+                                inScaleMode,
+                                inTangentMode,
                                 inControllers
                             };
     vector<MObject> outputs = {
