@@ -94,9 +94,6 @@ MStatus FkIk2Bones::compute(const MPlug& plug, MDataBlock& data)
         double b1Length = bone1Length * bone1Scale;
         double b2Length = bone2Length * bone2Scale;
 
-        // Quick fix on alignAxis because it get an offset, I need to find why.
-        alignAxis -= 65536*upVectorAxis;
-
         // Compute the ik.
         computeIk(ikRootPos, ikUpPos, ikEffPos, b1Length, b2Length,
                     activeStretch, alignAxis, upVectorAxis, negativeScale, invertIK,
@@ -183,22 +180,23 @@ MStatus FkIk2Bones::initialize()
     inBlendIkFk = addInputFloatAttribute(stat, MString("blendFkIk"), MString("blend"), 0.0, 0.0, 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
-    inActiveStretch = addInputIntAttribute(stat, MString("activateStretch"), MString("activateS"), 0);
-    if(!stat) {stat.perror("addAttribute"); return stat;}
-    
+    // Parameters need to be intercaled to avoid int offset.
     vector<MString> alignAxisEnum = {MString("+X"), MString("+Y"), MString("+Z"), MString("-X"), MString("-Y"), MString("-Z")};
     inAlignAxis = addInputEnumAttribute(stat, MString("alignAxis"), MString("alignAxis"), 0, alignAxisEnum);
+    if(!stat) {stat.perror("addAttribute"); return stat;}
+
+    inActiveStretch = addInputIntAttribute(stat, MString("activateStretch"), MString("activateS"), 0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
     vector<MString> upVectorAxisEnum = {MString("+X"), MString("+Y"), MString("+Z"), MString("-X"), MString("-Y"), MString("-Z")};
     inUpVectorAxis = addInputEnumAttribute(stat, MString("upVectorAxis"), MString("upVectorAxis"), 1, upVectorAxisEnum);;
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
+    inInvertIK = addInputFloatAttribute(stat, MString("invertIK"), MString("invertIK"), 1.0, -1.0, 1.0);
+    if(!stat) {stat.perror("addAttribute"); return stat;}
+
     vector<MString> negScaleEnum = {MString("None"), MString("X"), MString("Y"), MString("Z")};
     inNegativeScale = addInputEnumAttribute(stat, MString("negativeScale"), MString("negativeScale"), 0, negScaleEnum);
-    if(!stat) {stat.perror("addAttribute"); return stat;}
-    
-    inInvertIK = addInputFloatAttribute(stat, MString("invertIK"), MString("invertIK"), 1.0, -1.0, 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
 
@@ -306,6 +304,7 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
             };
 
     MMatrix transform = MMatrix(matrix);
+    cout << "Initial transform: " << transform << endl;
 
     if(negativeScale > 0)
     {
@@ -316,6 +315,7 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
         else if (negativeScale == 3) {double symMatrixArray[4][4] = {1,0,0,0,0,1,0,0,0,0,-1,0,0,0,0,1}; symMatrix = symMatrixArray; }
 
         transform = symMatrix * transform;
+        cout << "Result transform: " << transform << endl;
     }
 
     return MTransformationMatrix(transform);
@@ -341,7 +341,7 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
 void FkIk2Bones::computeIk(MVector rootPos, MVector upPos, MVector effPos,
                 double b1Length, double b2Length,
                 int activeStretch, int alignAxis, int upVectorAxis,
-                double negativeScale, double invertIk,
+                int negativeScale, double invertIk,
                 MTransformationMatrix &b1Trans, MTransformationMatrix &b2Trans, MTransformationMatrix &b3Trans)
 {
     // Compute the vector between the root and the effector.
