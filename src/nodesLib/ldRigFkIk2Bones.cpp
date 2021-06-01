@@ -41,6 +41,7 @@ MObject FkIk2Bones::inAlignAxis;
 MObject FkIk2Bones::inUpVectorAxis;
 MObject FkIk2Bones::inNegativeScale;
 MObject FkIk2Bones::inInvertIK;
+MObject FkIk2Bones::inParentMatrix;
 
 MObject FkIk2Bones::outBone1Transform;
 MObject FkIk2Bones::outBone2Transform;
@@ -74,6 +75,7 @@ MStatus FkIk2Bones::compute(const MPlug& plug, MDataBlock& data)
     MTransformationMatrix fkB1Trans       = getMatrix(data, inFkBone1);
     MTransformationMatrix fkB2Trans       = getMatrix(data, inFkBone2);
     MTransformationMatrix fkB3Trans       = getMatrix(data, inFkBone3);
+    MTransformationMatrix parentTrans     = getMatrix(data, inParentMatrix);
 
     MTransformationMatrix b1Transform, b2Transform, b3Transform;
     
@@ -90,12 +92,16 @@ MStatus FkIk2Bones::compute(const MPlug& plug, MDataBlock& data)
         MVector ikUpPos = ikUpTrans.translation(MSpace::kWorld);
         MVector ikEffPos = ikEffTrans.translation(MSpace::kWorld);
 
+        // Get the scale vector.
+        double parentScale[3];
+        parentTrans.getScale(parentScale, MSpace::kWorld);
+
         // Compute the final bone length.
         double b1Length = bone1Length * bone1Scale;
         double b2Length = bone2Length * bone2Scale;
 
         // Compute the ik.
-        computeIk(ikRootPos, ikUpPos, ikEffPos, b1Length, b2Length,
+        computeIk(ikRootPos, ikUpPos, ikEffPos, b1Length, b2Length, parentScale,
                     activeStretch, alignAxis, upVectorAxis, negativeScale, invertIK,
                     b1Transform, b2Transform, b3Transform);
 
@@ -199,6 +205,8 @@ MStatus FkIk2Bones::initialize()
     inNegativeScale = addInputEnumAttribute(stat, MString("negativeScale"), MString("negativeScale"), 0, negScaleEnum);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
+    inParentMatrix = addInputMatrixAttribute(stat, MString("parentMatrix"), MString("parentMatrix"));
+    if(!stat) {stat.perror("addAttribute"); return stat;}
 
     outBone1Transform = addOutputMatrixAttribute(stat, MString("bone1Transform"), MString("b1Trans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
@@ -304,7 +312,6 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
             };
 
     MMatrix transform = MMatrix(matrix);
-    cout << "Initial transform: " << transform << endl;
 
     if(negativeScale > 0)
     {
@@ -315,7 +322,6 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
         else if (negativeScale == 3) {double symMatrixArray[4][4] = {1,0,0,0,0,1,0,0,0,0,-1,0,0,0,0,1}; symMatrix = symMatrixArray; }
 
         transform = symMatrix * transform;
-        cout << "Result transform: " << transform << endl;
     }
 
     return MTransformationMatrix(transform);
@@ -329,6 +335,7 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
  * @param effPos        MVector                 Position of the effector.
  * @param b1Length      double                  Length of the bone 1.
  * @param b2Length      double                  Length of the bone 2.
+ * @param parentScale   double[3]               Parent scale factor.
  * @param activeStretch int                     Is ik stretchable.
  * @param alignAxis     int                     Align axis.
  * @param upVectorAxis  int                     Up vector axis.
@@ -339,11 +346,14 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
  * @param &b3Trans      MTransformationMatrix   Bone 3 output transformations.
  */
 void FkIk2Bones::computeIk(MVector rootPos, MVector upPos, MVector effPos,
-                double b1Length, double b2Length,
+                double b1Length, double b2Length, double parentScale[3],
                 int activeStretch, int alignAxis, int upVectorAxis,
                 int negativeScale, double invertIk,
                 MTransformationMatrix &b1Trans, MTransformationMatrix &b2Trans, MTransformationMatrix &b3Trans)
 {
+    // Parent scale vector.
+    MVector scaleFactor = MVector(parentScale);
+
     // Compute the vector between the root and the effector.
     MVector toEff = effPos - rootPos;
     double ikLength = toEff.length();

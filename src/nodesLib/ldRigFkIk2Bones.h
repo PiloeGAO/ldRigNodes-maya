@@ -17,7 +17,7 @@ public:
 
     double cosinusLaw(double a, double b, double c);
     void computeIk(MVector rootPos, MVector upPos, MVector effPos,
-                    double b1Length, double b2Length,
+                    double b1Length, double b2Length, double parentScale[3],
                     int activeStretch, int alignAxis, int upVectorAxis,
                     int negativeScale, double invertIk,
                     MTransformationMatrix &b1Trans, MTransformationMatrix &b2Trans, MTransformationMatrix &b3Trans);
@@ -44,6 +44,7 @@ public:
     static MObject inUpVectorAxis;
     static MObject inNegativeScale;
     static MObject inInvertIK;
+    static MObject inParentMatrix;
 
     static MObject outBone1Transform;
     static MObject outBone2Transform;
