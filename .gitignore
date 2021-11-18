@@ -34,5 +34,8 @@
 # Build directories
 build/
 
+# Documentation directory
+moduleSources/doc/
+
 # Code editor settings
 .vscode/

@@ -1,5 +1,5 @@
 /**
- * @file ldBasicConstraint.cpp
+ * @file ldRigBasicConstraint.cpp
  * @author Leo DEPOIX (leonumerique@gmail.com)
  * @brief Register a basic constraint node.
  * @version 0.1

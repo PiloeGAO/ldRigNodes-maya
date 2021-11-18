@@ -1,5 +1,5 @@
 /**
- * @file ldTwistNode.cpp
+ * @file ldRigTwistNode.cpp
  * @author Leo DEPOIX (leonumerique@gmail.com), Guillaume Baratte (Initial work in Python)
  * @brief Register a twist node.
  * @version 0.1

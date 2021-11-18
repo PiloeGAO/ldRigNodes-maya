@@ -1,5 +1,5 @@
 /**
- * @file ldFkIk2Bones.cpp
+ * @file ldRigFkIk2Bones.cpp
  * @author Leo DEPOIX (leonumerique@gmail.com)
  * @brief Register a fk/ik 2 bones node.
  * @version 0.1
