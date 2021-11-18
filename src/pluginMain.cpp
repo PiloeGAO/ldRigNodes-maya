@@ -31,10 +31,6 @@
 #include "nodesLib/ldRigSelectCasesNode.h"
 #include "nodesLib/ldRigIkPlane.h"
 
-/* Setup defines */
-#define PLUGIN_COMPANY "Leo DEPOIX"
-#define PLUGIN_VERSION "0.1"
-
 /**
  * @brief Load the plugin in Maya.
  * 
@@ -44,7 +40,7 @@
 MStatus initializePlugin(MObject obj)
 {
     MStatus status;
-    MFnPlugin plugin(obj, PLUGIN_COMPANY, PLUGIN_VERSION, "Any");
+    MFnPlugin plugin(obj, "Leo DEPOIX", "0.2.0", "Any");
 
     /* Loading Nodes. */
     status = plugin.registerNode("ldBasicConstraint", BasicConstraint::id, &BasicConstraint::creator, &BasicConstraint::initialize);

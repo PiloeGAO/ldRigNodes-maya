@@ -29,6 +29,7 @@ MObject FkIk2Bones::inBone1Length;
 MObject FkIk2Bones::inBone2Length;
 MObject FkIk2Bones::inBone1Scale;
 MObject FkIk2Bones::inBone2Scale;
+MObject FkIk2Bones::inGlobalScale;
 MObject FkIk2Bones::inIkRoot;
 MObject FkIk2Bones::inIkUpVector;
 MObject FkIk2Bones::inIkEffector;
@@ -41,7 +42,6 @@ MObject FkIk2Bones::inAlignAxis;
 MObject FkIk2Bones::inUpVectorAxis;
 MObject FkIk2Bones::inNegativeScale;
 MObject FkIk2Bones::inInvertIK;
-MObject FkIk2Bones::inParentMatrix;
 
 MObject FkIk2Bones::outBone1Transform;
 MObject FkIk2Bones::outBone2Transform;
@@ -63,6 +63,7 @@ MStatus FkIk2Bones::compute(const MPlug& plug, MDataBlock& data)
     double bone2Length     = getFloat(data, inBone2Length);
     double bone1Scale      = getFloat(data, inBone1Scale);
     double bone2Scale      = getFloat(data, inBone2Scale);
+    double globalScale     = getFloat(data, inGlobalScale);
     double blendIkFk       = getFloat(data, inBlendIkFk);
     int activeStretch      = getInt(data, inActiveStretch);
     int alignAxis          = getInt(data, inAlignAxis);
@@ -75,7 +76,6 @@ MStatus FkIk2Bones::compute(const MPlug& plug, MDataBlock& data)
     MTransformationMatrix fkB1Trans       = getMatrix(data, inFkBone1);
     MTransformationMatrix fkB2Trans       = getMatrix(data, inFkBone2);
     MTransformationMatrix fkB3Trans       = getMatrix(data, inFkBone3);
-    MTransformationMatrix parentTrans     = getMatrix(data, inParentMatrix);
 
     MTransformationMatrix b1Transform, b2Transform, b3Transform;
     
@@ -92,16 +92,12 @@ MStatus FkIk2Bones::compute(const MPlug& plug, MDataBlock& data)
         MVector ikUpPos = ikUpTrans.translation(MSpace::kWorld);
         MVector ikEffPos = ikEffTrans.translation(MSpace::kWorld);
 
-        // Get the scale vector.
-        double parentScale[3];
-        parentTrans.getScale(parentScale, MSpace::kWorld);
-
         // Compute the final bone length.
-        double b1Length = bone1Length * bone1Scale;
-        double b2Length = bone2Length * bone2Scale;
+        double b1Length = bone1Length * bone1Scale * globalScale;
+        double b2Length = bone2Length * bone2Scale * globalScale;
 
         // Compute the ik.
-        computeIk(ikRootPos, ikUpPos, ikEffPos, b1Length, b2Length, parentScale,
+        computeIk(ikRootPos, ikUpPos, ikEffPos, b1Length, b2Length, globalScale,
                     activeStretch, alignAxis, upVectorAxis, negativeScale, invertIK,
                     b1Transform, b2Transform, b3Transform);
 
@@ -165,6 +161,9 @@ MStatus FkIk2Bones::initialize()
     inBone2Scale = addInputFloatAttribute(stat, MString("bone2Scale"), MString("b2S"), 1.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
+    inGlobalScale = addInputFloatAttribute(stat, MString("globalScale"), MString("gS"), 1.0);
+    if(!stat) {stat.perror("addAttribute"); return stat;}
+    
     inIkRoot = addInputMatrixAttribute(stat, MString("ikRoot"), MString("ikR"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
     
@@ -205,9 +204,6 @@ MStatus FkIk2Bones::initialize()
     inNegativeScale = addInputEnumAttribute(stat, MString("negativeScale"), MString("negativeScale"), 0, negScaleEnum);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inParentMatrix = addInputMatrixAttribute(stat, MString("parentMatrix"), MString("parentMatrix"));
-    if(!stat) {stat.perror("addAttribute"); return stat;}
-
     outBone1Transform = addOutputMatrixAttribute(stat, MString("bone1Transform"), MString("b1Trans"));
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
@@ -222,6 +218,7 @@ MStatus FkIk2Bones::initialize()
                                 inBone2Length,
                                 inBone1Scale,
                                 inBone2Scale,
+                                inGlobalScale,
                                 inIkRoot,
                                 inIkUpVector,
                                 inIkEffector,
@@ -272,11 +269,12 @@ double FkIk2Bones::cosinusLaw(double a, double b, double c)
  * @param axis0         MVector                 The orientation of the axis X.
  * @param axis1         MVector                 The orientation of the axis Y.
  * @param upVectorAxis  int                     The up vector axis.
- * @param negativeScale int                     The negative scale axis.  
+ * @param negativeScale int                     The negative scale axis.
+ * @param globalScale   double                  Global scale to apply.
  * @return              MTransformationMatrix   The transformation matrix.
  */
 MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVector axis1,
-                                    int alignAxis, int upVectorAxis, int negativeScale)
+                                    int alignAxis, int upVectorAxis, int negativeScale, double globalScale)
 {
     MVector axisX;
     bool isAxisX = false;
@@ -305,9 +303,9 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
     else {axisX = MVector::xAxis; axisY = MVector::yAxis; axisZ = MVector::zAxis; }
 
     double matrix[4][4] = {
-            axisX.x, axisX.y, axisX.z, 0.0,
-            axisY.x, axisY.y, axisY.z, 0.0,
-            axisZ.x, axisZ.y, axisZ.z, 0.0,
+            axisX.x * globalScale, axisX.y * globalScale, axisX.z * globalScale, 0.0,
+            axisY.x * globalScale, axisY.y * globalScale, axisY.z * globalScale, 0.0,
+            axisZ.x * globalScale, axisZ.y * globalScale, axisZ.z * globalScale, 0.0,
             pos.x,   pos.y,   pos.z,   1.0
             };
 
@@ -335,7 +333,7 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
  * @param effPos        MVector                 Position of the effector.
  * @param b1Length      double                  Length of the bone 1.
  * @param b2Length      double                  Length of the bone 2.
- * @param parentScale   double[3]               Parent scale factor.
+ * @param globalScale   double                  Global scale to apply.
  * @param activeStretch int                     Is ik stretchable.
  * @param alignAxis     int                     Align axis.
  * @param upVectorAxis  int                     Up vector axis.
@@ -346,14 +344,11 @@ MTransformationMatrix FkIk2Bones::buildTransform(MVector pos, MVector axis0, MVe
  * @param &b3Trans      MTransformationMatrix   Bone 3 output transformations.
  */
 void FkIk2Bones::computeIk(MVector rootPos, MVector upPos, MVector effPos,
-                double b1Length, double b2Length, double parentScale[3],
+                double b1Length, double b2Length, double globalScale,
                 int activeStretch, int alignAxis, int upVectorAxis,
                 int negativeScale, double invertIk,
                 MTransformationMatrix &b1Trans, MTransformationMatrix &b2Trans, MTransformationMatrix &b3Trans)
 {
-    // Parent scale vector.
-    MVector scaleFactor = MVector(parentScale);
-
     // Compute the vector between the root and the effector.
     MVector toEff = effPos - rootPos;
     double ikLength = toEff.length();
@@ -397,9 +392,9 @@ void FkIk2Bones::computeIk(MVector rootPos, MVector upPos, MVector effPos,
     MVector b3Pos = b2Pos + b2Dir * b2Length;
 
     // Compute the bones tranformations.
-    b1Trans = buildTransform(rootPos, b1Dir, ikAxis, alignAxis, upVectorAxis, negativeScale);
-    b2Trans = buildTransform(b2Pos, b2Dir, ikAxis, alignAxis, upVectorAxis, negativeScale);
-    b3Trans = buildTransform(b3Pos, b2Dir, ikAxis, alignAxis, upVectorAxis, negativeScale);
+    b1Trans = buildTransform(rootPos, b1Dir, ikAxis, alignAxis, upVectorAxis, negativeScale, globalScale);
+    b2Trans = buildTransform(b2Pos, b2Dir, ikAxis, alignAxis, upVectorAxis, negativeScale, globalScale);
+    b3Trans = buildTransform(b3Pos, b2Dir, ikAxis, alignAxis, upVectorAxis, negativeScale, globalScale);
 }
 
 /**

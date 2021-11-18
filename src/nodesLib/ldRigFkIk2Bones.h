@@ -17,13 +17,13 @@ public:
 
     double cosinusLaw(double a, double b, double c);
     void computeIk(MVector rootPos, MVector upPos, MVector effPos,
-                    double b1Length, double b2Length, double parentScale[3],
+                    double b1Length, double b2Length, double globalScale,
                     int activeStretch, int alignAxis, int upVectorAxis,
                     int negativeScale, double invertIk,
                     MTransformationMatrix &b1Trans, MTransformationMatrix &b2Trans, MTransformationMatrix &b3Trans);
     MTransformationMatrix blendTransform(MTransformationMatrix matrixA, MTransformationMatrix matrixB, double blend);
     MTransformationMatrix buildTransform(MVector pos, MVector axis0, MVector axis1,
-                                        int alignAxis, int upVectorAxis, int negativeScale);
+                                        int alignAxis, int upVectorAxis, int negativeScale, double globalScale);
 
 public:
     static MTypeId id;
@@ -32,6 +32,7 @@ public:
     static MObject inBone2Length;
     static MObject inBone1Scale;
     static MObject inBone2Scale;
+    static MObject inGlobalScale;
     static MObject inIkRoot;
     static MObject inIkUpVector;
     static MObject inIkEffector;
@@ -44,7 +45,6 @@ public:
     static MObject inUpVectorAxis;
     static MObject inNegativeScale;
     static MObject inInvertIK;
-    static MObject inParentMatrix;
 
     static MObject outBone1Transform;
     static MObject outBone2Transform;
