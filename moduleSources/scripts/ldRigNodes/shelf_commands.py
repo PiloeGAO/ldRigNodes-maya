@@ -305,3 +305,20 @@ def paste_custom_attribute():
                 cmds.setAttr(currentNode + "." + data["channelName"], data["channelValue"])
             else:
                 print("Attribute already exist")
+
+# Clear namespaces.
+def clear_namespaces():
+    """Clear all namespaces in the scene and rename objects with "_".
+    By: Louis Lukasik
+    """
+    for ns in cmds.namespaceInfo(':', lon=True):
+        if(ns != 'shared' and ns != 'UI' or ns != "blendShapes"):
+            print(ns)
+            for obj in cmds.namespaceInfo(ns, ls=True):
+                print(obj)
+                newName = obj.replace(':', '_')
+                print(newName)
+                try:
+                    cmds.rename(obj, newName)
+                except:
+                    pass

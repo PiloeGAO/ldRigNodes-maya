@@ -44,6 +44,11 @@ def create_shelf():
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 
+   # Clear namespaces.
+   cmds.shelfButton(label='Clear namespaces', command='from ldRigNodes.shelf_commands import clear_namespaces; clear_namespaces()', sourceType='python', annotation='', image='clear_namespaces.png', style='iconOnly')
+
+   cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
+
    # Space Switches Management.
    cmds.shelfButton(label='Open Space Switch Manager', command='from ldRigNodes.space_switch_manager import open_ui; open_ui(); ', sourceType='python', annotation='', image='ssm.png', style='iconOnly')
    
