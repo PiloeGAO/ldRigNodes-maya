@@ -41,3 +41,9 @@ def create_shelf():
    cmds.shelfButton(label='Copy And Link Attributes', command='from ldRigNodes.shelf_commands import copy_and_link_attributes; copy_and_link_attributes()', sourceType='python', annotation='', image='copy_and_link_attributes.png', style='iconOnly')
    cmds.shelfButton(label='Copy Attributes', command='from ldRigNodes.shelf_commands import copy_custom_attribute; copy_custom_attribute()', sourceType='python', annotation='', image='copy_custom_attribute.png', style='iconOnly')
    cmds.shelfButton(label='Paste Attributes', command='from ldRigNodes.shelf_commands import paste_custom_attribute; paste_custom_attribute()', sourceType='python', annotation='', image='paste_custom_attribute.png', style='iconOnly')
+
+   cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
+
+   # Space Switches Management.
+   cmds.shelfButton(label='Open Space Switch Manager', command='from ldRigNodes.space_switch_manager import open_ui; open_ui(); ', sourceType='python', annotation='', image='ssm.png', style='iconOnly')
+   
