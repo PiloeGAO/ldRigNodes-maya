@@ -1,4 +1,10 @@
-# Populating the Master setup with all selected module's setups.
+'''
+    :package:   ldRigNodes
+    :file:      shelf_commands.py
+    :author:    ldepoix
+    :version:   0.0.2
+    :brief:     List of all functions for rigging to be stored in the shelf.
+'''
 import json
 
 from maya import cmds

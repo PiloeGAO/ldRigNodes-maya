@@ -1,3 +1,10 @@
+'''
+    :package:   ldRigNodes
+    :file:      utils.py
+    :author:    ldepoix
+    :version:   0.0.2
+    :brief:     List of usefull functions to perform standard operations.
+'''
 from maya import cmds, mel
 import ctypes
 import sys
