@@ -8,6 +8,8 @@
 import maya.cmds as cmds
 import maya
 
+from ldRigNodes.space_switch_auto_builder import get_autobuilder_config
+
 def remove_shelf():
    if cmds.shelfLayout('ldRigNodes', exists=True):
       cmds.deleteUI('ldRigNodes')
@@ -51,4 +53,6 @@ def create_shelf():
 
    # Space Switches Management.
    cmds.shelfButton(label='Open Space Switch Manager', command='from ldRigNodes.space_switch_manager import open_ui; open_ui(); ', sourceType='python', annotation='', image='ssm.png', style='iconOnly')
-   
+   if(get_autobuilder_config() != None):
+      cmds.shelfButton(label='Build Space Switch', command='from ldRigNodes.space_switch_auto_builder import autobuild_hierarchy; autobuild_hierarchy(); ', sourceType='python', annotation='', image='autobuild_ss.png', style='iconOnly')
+      cmds.shelfButton(label='Clear Space Switch', command='from ldRigNodes.space_switch_auto_builder import autoclear_hierarchy; autoclear_hierarchy(); ', sourceType='python', annotation='', image='autoclear_ss.png', style='iconOnly')

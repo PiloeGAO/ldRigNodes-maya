@@ -5,12 +5,16 @@
     :version:   0.0.2
     :brief:     List of usefull functions to perform standard operations.
 '''
-from maya import cmds, mel
+import os
 import ctypes
 import sys
 import subprocess
 
+from maya import cmds, mel
+
 CF_TEXT = 1
+
+CURRENT_INSTALL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def copy_to_clipboard(s):
     """Clipboard copy. | source: https://gist.github.com/adam-p/4173174

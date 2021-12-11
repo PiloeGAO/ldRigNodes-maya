@@ -1,0 +1,21 @@
+[
+    {
+        "module_name": "hand",
+        "mirrorable": true,
+        "links": [
+            {
+                "element_name": "hand_FK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "arm",
+                        "mirrorable": true,
+                        "name": "endHand_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    }
+]
