@@ -312,13 +312,25 @@ def clear_namespaces():
     By: Louis Lukasik
     """
     for ns in cmds.namespaceInfo(':', lon=True):
-        if(ns != 'shared' and ns != 'UI' or ns != "blendShapes"):
-            print(ns)
-            for obj in cmds.namespaceInfo(ns, ls=True):
-                print(obj)
-                newName = obj.replace(':', '_')
-                print(newName)
-                try:
-                    cmds.rename(obj, newName)
-                except:
-                    pass
+        if(ns == 'shared' or ns == 'UI' or ns == "blendShapes" or type(ns) == None):
+            continue
+        
+        namespace_list = cmds.namespaceInfo(ns, ls=True)
+        if(type(namespace_list) == None): continue
+
+        print(f"Editing {ns}")
+        for obj in namespace_list:
+            new_name = obj.replace(':', '_')
+            
+            try:
+                cmds.rename(obj, new_name)
+                print(f"Renaming: {obj} > {new_name}")
+            except:
+                pass
+        
+        try:
+            cmds.namespace(rm=str(ns))
+        except:
+                pass
+        else:
+            print(f"Failed to remove namespace {ns}")
