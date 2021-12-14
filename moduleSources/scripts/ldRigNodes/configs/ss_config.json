@@ -1,5 +1,222 @@
 [
     {
+        "module_name": "spine",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "controllers_GRP",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "neck",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "FK_GRP",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToChest_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "head_IK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "head__JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "head",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "head_FK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "neck",
+                        "mirrorable": false,
+                        "name": "fkHeadAttach",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "facial",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "jaw_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "jaw_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "head_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "head__JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "eyes",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "head_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "head__JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "clavicle",
+        "mirrorable": true,
+        "links": [
+            {
+                "element_name": "inputParent_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToChest_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "arm",
+        "mirrorable": true,
+        "links": [
+            {
+                "element_name": "shoulderAttach_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "clavicle",
+                        "mirrorable": true,
+                        "name": "outputClavicle_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "hand_IK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "clavicle",
+                        "mirrorable": true,
+                        "name": "outputClavicle_BUF",
+                        "type": "srt",
+                        "ui_name": "Clavicle"
+                    },
+                    {
+                        "id":1,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "upperBody_MIX_CON",
+                        "type": "srt",
+                        "ui_name": "UpperBody"
+                    },
+                    {
+                        "id":2,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "srt",
+                        "ui_name": "Local"
+                    }
+                ]
+            },
+            {
+                "element_name": "upVector_IK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "clavicle",
+                        "mirrorable": true,
+                        "name": "outputClavicle_BUF",
+                        "type": "srt",
+                        "ui_name": "Clavicle"
+                    },
+                    {
+                        "id":1,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "upperBody_MIX_CON",
+                        "type": "srt",
+                        "ui_name": "UpperBody"
+                    },
+                    {
+                        "id":2,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "srt",
+                        "ui_name": "Local"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "module_name": "hand",
         "mirrorable": true,
         "links": [
@@ -13,6 +230,67 @@
                         "name": "endHand_BUF",
                         "type": "srt",
                         "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "leg",
+        "mirrorable": true,
+        "links": [
+            {
+                "element_name": "femurAttach_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToHips_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "upVector_IK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToHips_BUF",
+                        "type": "srt",
+                        "ui_name": "Hips"
+                    },
+                    {
+                        "id":1,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "srt",
+                        "ui_name": "Local"
+                    }
+                ]
+            },
+            {
+                "element_name": "foot_IK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToHips_BUF",
+                        "type": "srt",
+                        "ui_name": "Hips"
+                    },
+                    {
+                        "id":1,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "srt",
+                        "ui_name": "Local"
                     }
                 ]
             }
