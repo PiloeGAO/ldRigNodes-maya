@@ -194,6 +194,23 @@ def tweakers_generator():
         if(cmds.objExists(f'{basename}_RST')):
             cmds.connectAttr(f'{basename}_RST.worldInverseMatrix[0]', '{}.bindPreMatrix[{}]'.format(skinClusterName, str(jntID)))
 
+# Display Tools.
+def copy_display():
+    """Copy display of a controller to clipboard.
+    """
+    current_node = "{}Shape".format(cmds.ls(sl=True)[0])
+    channel_value = cmds.getAttr(current_node + ".offsetMatrix")
+    
+    copy_to_clipboard(str(channel_value).encode())
+
+def paste_display():
+    """Paste display of a controller from clipboard.
+    """
+    current_node = "{}Shape".format(cmds.ls(sl=True)[0])
+    values = json.loads(get_clipboard_text().decode())
+    
+    cmds.setAttr(f"{current_node}.offsetMatrix", values, type="matrix")
+
 # Attributes Management.
 def copy_and_link_attributes():
     """Copy and link attributes from selection to the last node.

@@ -38,7 +38,12 @@ def create_shelf():
    cmds.shelfButton(label='Tweakers Generator', command='from ldRigNodes.shelf_commands import tweakers_generator; tweakers_generator()', sourceType='python', annotation='', image='singleplayer.png', style='iconOnly')
    
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
-
+   
+   # Display Tools.
+   cmds.shelfButton(label='Copy Display', command='from ldRigNodes.shelf_commands import copy_display; copy_display()', sourceType='python', annotation='', imageOverlayLabel='DISPL', image='export.png', style='iconOnly')
+   cmds.shelfButton(label='Paste Display', command='from ldRigNodes.shelf_commands import paste_display; paste_display()', sourceType='python', annotation='', imageOverlayLabel='DISPL', image='import.png', style='iconOnly')
+   
+   cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
    # Attributes Management.
    cmds.shelfButton(label='Copy And Link Attributes', command='from ldRigNodes.shelf_commands import copy_and_link_attributes; copy_and_link_attributes()', sourceType='python', annotation='', image='key.png', style='iconOnly')
    cmds.shelfButton(label='Copy Attributes', command='from ldRigNodes.shelf_commands import copy_custom_attribute; copy_custom_attribute()', sourceType='python', annotation='', image='export.png', style='iconOnly')
