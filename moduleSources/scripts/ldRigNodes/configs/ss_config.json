@@ -42,7 +42,7 @@
                         "id":0,
                         "module": "head",
                         "mirrorable": false,
-                        "name": "head__JNT",
+                        "name": "head_FK_CON",
                         "type": "srt",
                         "ui_name": "Parent"
                     }
@@ -93,7 +93,7 @@
                         "id":0,
                         "module": "head",
                         "mirrorable": false,
-                        "name": "head__JNT",
+                        "name": "head_FK_CON",
                         "type": "srt",
                         "ui_name": "Parent"
                     }
@@ -112,7 +112,7 @@
                         "id":0,
                         "module": "head",
                         "mirrorable": false,
-                        "name": "head__JNT",
+                        "name": "head_FK_CON",
                         "type": "srt",
                         "ui_name": "Parent"
                     }
