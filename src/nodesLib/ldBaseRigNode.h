@@ -59,6 +59,9 @@ public:
     static MObject addOutputFloatAttribute(MStatus &status, MString longName, MString shortName,
                                             bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
     
+    static MObject addOutputArrayFloatAttribute(MStatus &status, MString longName, MString shortName,
+                                                bool writable = false, bool storable = false, bool readable = true, bool hidden = false);
+
     static float getFloat(MDataBlock &dataBlock, MObject input);
 
     // Add IO Matrix.

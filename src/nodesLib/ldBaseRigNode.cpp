@@ -403,6 +403,37 @@ MObject BaseRigNode::addOutputFloatAttribute(MStatus &status, MString longName, 
 }
 
 /**
+ * @brief Add a float array output attribute.
+ * 
+ * @param status    MStatus The status of the creation.
+ * @param longName  MString The long name.
+ * @param shortName MString The short name.
+ * @param writable  bool    Allow the attribute to be writable.
+ * @param storable  bool    Allow the attribute to be storable.
+ * @param readable  bool    Allow the attribute to be readable.
+ * @param hidden    bool    Allow the attribute to be hidden.
+ * @return          MObject The attribute.
+ */
+MObject BaseRigNode::addOutputArrayFloatAttribute(MStatus &status, MString longName, MString shortName,
+                                            bool writable, bool storable, bool readable, bool hidden)
+{
+    MFnNumericAttribute numAttribFn;
+
+    MObject attrib = numAttribFn.create(longName, shortName, MFnNumericData::kFloat);
+
+    numAttribFn.setWritable(writable);
+    numAttribFn.setStorable(storable);
+    numAttribFn.setReadable(readable);
+    numAttribFn.setHidden(hidden);
+    numAttribFn.setArray(true);
+    numAttribFn.setUsesArrayDataBuilder(true);
+
+    status = addAttribute(attrib);
+
+    return attrib;
+}
+
+/**
  * @brief Get float stored in a MObject.
  * 
  * @param dataBlock MDataBlock  The data block of the node.
