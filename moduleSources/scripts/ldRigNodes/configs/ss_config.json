@@ -80,7 +80,7 @@
                         "id":0,
                         "module": "head",
                         "mirrorable": false,
-                        "name": "jaw_BUF",
+                        "name": "jawAttach_BUF",
                         "type": "srt",
                         "ui_name": "Parent"
                     }

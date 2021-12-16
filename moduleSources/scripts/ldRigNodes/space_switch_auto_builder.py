@@ -11,7 +11,7 @@ from posixpath import basename
 
 from maya import cmds
 
-from ldRigNodes.utils import CURRENT_INSTALL_DIR
+from ldRigNodes.utils import CURRENT_INSTALL_DIR, concatanate_list
 from ldRigNodes.space_switch_manager import SpaceSwitchManager
 
 def get_autobuilder_config():
@@ -59,8 +59,22 @@ def autobuild_hierarchy():
 
             for link in module_content['links']:
                 object_name = "{}_{}".format(base_name, link['element_name'])
+                
+                if(not cmds.objExists(f"{object_name}")):
+                    print(f"No object {object_name}")
+                    continue
+                
+                spaceSwitchtools = SpaceSwitchManager(nodeName=object_name)
 
                 targets = sorted(link['targets'], key=lambda d: d['id'])
+                
+                # List all spaces switches.
+                space_switches_names = []
+
+                # Built the floatSwitchNode.
+                float_switch_node = cmds.createNode('ldRigFloatSwitchNode')
+                cmds.setAttr(f'{float_switch_node}.outputCount',  len(targets))
+                
                 for target in targets:
                     target_module_base_name = target['module']
 
@@ -75,9 +89,37 @@ def autobuild_hierarchy():
                         target['name']
                     )
 
-                    spaceSwitchtools = SpaceSwitchManager(nodeName=object_name)
+                    if(not cmds.objExists(f"{target_name}")):
+                        print(f"Failed to find {target_name}")
+                        continue
+
                     spaceSwitchtools.add_space(target_name, get_space_switch_type(target['type']))
-                    # print(target['ui_name'])
+                    
+                    space_switches_names.append(target['ui_name'])
+                
+                space_switch_node = spaceSwitchtools.get_space_switch_node()
+
+
+                if(space_switch_node == None or len(space_switches_names) == 0):
+                    print(f"Skipping {object_name} - [{len(space_switches_names)}]")
+                    continue
+
+                cmds.rename(space_switch_node , f"spaceSwitch_{object_name}")
+
+                cmds.addAttr(
+                    f"{base_name}_setup",
+                    attributeType="enum",
+                    longName=f"spaceSwitches_{link['element_name']}",
+                    enumName=concatanate_list(space_switches_names),
+                    hidden = False,
+                    keyable = True
+                )
+
+                cmds.connectAttr(f"{base_name}_setup.spaceSwitches_{link['element_name']}", f"{float_switch_node}.caseID")
+
+                for index, name in enumerate(space_switches_names):
+                    cmds.connectAttr(f"{float_switch_node}.outputValues[{index}]", f"spaceSwitch_{object_name}.spaces[{index}].weight")
+
 
 def autoclear_hierarchy():
     """Clear all the space switches from the config file (other are skipped).
@@ -101,6 +143,14 @@ def autoclear_hierarchy():
 
             for link in module_content['links']:
                 object_name = "{}_{}".format(base_name, link['element_name'])
-
+                
+                if(not cmds.objExists(f"{object_name}")):
+                    print(f"Failed to find {object_name}")
+                    continue
+                
                 spaceSwitchtools = SpaceSwitchManager(nodeName=object_name)
                 spaceSwitchtools.delete_space_switch()
+
+                # Delete the enum.
+                if(cmds.attributeQuery(f"spaceSwitches_{link['element_name']}", node=f"{base_name}_setup", listEnum=True) != None):
+                    cmds.deleteAttr(f"{base_name}_setup.spaceSwitches_{link['element_name']}")
