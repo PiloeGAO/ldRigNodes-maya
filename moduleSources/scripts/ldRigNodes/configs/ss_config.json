@@ -117,6 +117,35 @@
                         "ui_name": "Parent"
                     }
                 ]
+            },
+            {
+                "element_name": "lookAt_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "head_FK_CON",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    },
+                    {
+                        "id":1,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "upperBody_MIX_CON",
+                        "type": "srt",
+                        "ui_name": "UpperBody"
+                    },
+                    {
+                        "id":2,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "srt",
+                        "ui_name": "Local"
+                    }
+                ]
             }
         ]
     },
