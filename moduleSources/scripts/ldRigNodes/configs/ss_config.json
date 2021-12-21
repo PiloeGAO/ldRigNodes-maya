@@ -36,7 +36,7 @@
                 ]
             },
             {
-                "element_name": "head_IK_BUF",
+                "element_name": "headConnect_BUF",
                 "targets": [
                     {
                         "id":0,
