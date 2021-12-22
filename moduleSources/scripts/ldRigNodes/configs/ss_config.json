@@ -150,6 +150,25 @@
         ]
     },
     {
+        "module_name": "hairs",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "hairsAttach_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "head_FK_CON",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "module_name": "clavicle",
         "mirrorable": true,
         "links": [

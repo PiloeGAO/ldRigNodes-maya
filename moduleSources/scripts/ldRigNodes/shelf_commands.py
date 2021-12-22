@@ -206,10 +206,11 @@ def copy_display():
 def paste_display():
     """Paste display of a controller from clipboard.
     """
-    current_node = "{}Shape".format(cmds.ls(sl=True)[0])
     values = json.loads(get_clipboard_text().decode())
-    
-    cmds.setAttr(f"{current_node}.offsetMatrix", values, type="matrix")
+
+    for current_node in cmds.ls(sl=True):
+        current_node = "{}Shape".format(current_node)
+        cmds.setAttr(f"{current_node}.offsetMatrix", values, type="matrix")
 
 def switch_modules_displays():
     """Switch modules display between Rig and Anim.
