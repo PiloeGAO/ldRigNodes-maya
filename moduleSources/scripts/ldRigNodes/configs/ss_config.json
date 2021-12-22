@@ -284,6 +284,77 @@
         ]
     },
     {
+        "module_name": "coat",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "fkMainController_GRP",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToChest_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "L_humerus_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "L_arm",
+                        "mirrorable": false,
+                        "name": "humerusRoll_0_JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "R_humerus_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "R_arm",
+                        "mirrorable": false,
+                        "name": "humerusRoll_0_JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "L_radius_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "L_arm",
+                        "mirrorable": false,
+                        "name": "radiusRoll_0_JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
+            {
+                "element_name": "R_radius_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "R_arm",
+                        "mirrorable": false,
+                        "name": "radiusRoll_0_JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "module_name": "leg",
         "mirrorable": true,
         "links": [
