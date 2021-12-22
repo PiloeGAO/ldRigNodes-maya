@@ -211,6 +211,43 @@ def paste_display():
     
     cmds.setAttr(f"{current_node}.offsetMatrix", values, type="matrix")
 
+def switch_modules_displays():
+    """Switch modules display between Rig and Anim.
+    """
+    modules_setups = []
+
+    mode_to_apply = ""
+
+    selection = cmds.ls(sl=True)
+
+    if(len(selection) == 0):
+        for sel in cmds.ls():
+            if(not "setup" in sel):
+                continue
+            modules_setups.append(sel)
+    else:
+        for sel in selection:
+            if(not "module" in sel):
+                continue
+            
+            for obj in cmds.listRelatives(sel, children=True):
+                if(not "setup" in obj):
+                    continue
+                modules_setups.append(obj)
+
+    for obj in modules_setups:
+        if(cmds.listAttr(f"{obj}", string="MODE") == None): continue
+        
+        if(mode_to_apply == ""):
+            # NOTE: This take the first setup and apply the opposite
+            # to the rest of the structure.
+            mode_to_apply = cmds.getAttr(f"{obj}.MODE")
+            
+            if(mode_to_apply == 0): mode_to_apply = 1
+            else: mode_to_apply  = 0
+            
+        cmds.setAttr(f"{obj}.MODE", mode_to_apply)
+
 # Attributes Management.
 def copy_and_link_attributes():
     """Copy and link attributes from selection to the last node.

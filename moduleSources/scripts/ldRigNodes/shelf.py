@@ -42,6 +42,7 @@ def create_shelf():
    # Display Tools.
    cmds.shelfButton(label='Copy Display', command='from ldRigNodes.shelf_commands import copy_display; copy_display()', sourceType='python', annotation='', imageOverlayLabel='DISPL', image='export.png', style='iconOnly')
    cmds.shelfButton(label='Paste Display', command='from ldRigNodes.shelf_commands import paste_display; paste_display()', sourceType='python', annotation='', imageOverlayLabel='DISPL', image='import.png', style='iconOnly')
+   cmds.shelfButton(label='Switch Module Displays', command='from ldRigNodes.shelf_commands import switch_modules_displays; switch_modules_displays()', sourceType='python', annotation='', imageOverlayLabel='', image='return.png', style='iconOnly')
    
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
    # Attributes Management.
