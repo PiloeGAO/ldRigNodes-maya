@@ -288,7 +288,7 @@
         "mirrorable": false,
         "links": [
             {
-                "element_name": "fkMainController_GRP",
+                "element_name": "fkMainControllers_GRP",
                 "targets": [
                     {
                         "id":0,
@@ -304,7 +304,7 @@
                 "element_name": "L_humerus_BUF",
                 "targets": [
                     {
-                        "id":0,
+                        "id":1,
                         "module": "L_arm",
                         "mirrorable": false,
                         "name": "humerusRoll_0_JNT",
@@ -317,7 +317,7 @@
                 "element_name": "R_humerus_BUF",
                 "targets": [
                     {
-                        "id":0,
+                        "id":2,
                         "module": "R_arm",
                         "mirrorable": false,
                         "name": "humerusRoll_0_JNT",
@@ -330,7 +330,7 @@
                 "element_name": "L_radius_BUF",
                 "targets": [
                     {
-                        "id":0,
+                        "id":3,
                         "module": "L_arm",
                         "mirrorable": false,
                         "name": "radiusRoll_0_JNT",
@@ -343,10 +343,29 @@
                 "element_name": "R_radius_BUF",
                 "targets": [
                     {
-                        "id":0,
+                        "id":4,
                         "module": "R_arm",
                         "mirrorable": false,
                         "name": "radiusRoll_0_JNT",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "module_name": "skirt",
+        "mirrorable": false,
+        "links": [
+            {
+                "element_name": "fkMainControllers_GRP",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToHips_BUF",
                         "type": "srt",
                         "ui_name": "Parent"
                     }
