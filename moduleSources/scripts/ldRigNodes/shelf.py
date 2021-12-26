@@ -35,7 +35,8 @@ def create_shelf():
 
    # Bones Creators.
    cmds.shelfButton(label='Auto Bones Generator', command='from ldRigNodes.shelf_commands import auto_bone_generator; auto_bone_generator()', sourceType='python', annotation='', image='contrast.png', style='iconOnly')
-   cmds.shelfButton(label='Tweakers Generator', command='from ldRigNodes.shelf_commands import tweakers_generator; tweakers_generator()', sourceType='python', annotation='', image='singleplayer.png', style='iconOnly')
+   cmds.shelfButton(label='Tweakers Generator', command='from ldRigNodes.shelf_commands import tweakers_generator; tweakers_generator()', sourceType='python', annotation='', imageOverlayLabel='TWEAK', image='singleplayer.png', style='iconOnly')
+   cmds.shelfButton(label='Hairs Generator', command='from ldRigNodes.shelf_commands import create_hairs; create_hairs()', sourceType='python', annotation='', imageOverlayLabel='HAIRS', image='singleplayer.png', style='iconOnly')
    
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
    

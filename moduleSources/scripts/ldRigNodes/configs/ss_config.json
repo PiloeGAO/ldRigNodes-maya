@@ -351,7 +351,20 @@
                         "ui_name": "Parent"
                     }
                 ]
-            }
+            },
+            {
+                "element_name": "ikCollarControllers_GRP",
+                "targets": [
+                    {
+                        "id":5,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "attachToChest_BUF",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            },
         ]
     },
     {

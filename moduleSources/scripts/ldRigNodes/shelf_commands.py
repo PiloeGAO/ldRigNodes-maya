@@ -9,9 +9,11 @@ import json
 
 from maya import cmds
 
-from ldRigNodes.utils import copy_to_clipboard, get_selected_channels, get_clipboard_text, concatanate_list
+from ldRigNodes.maya_utils import concatanate_list, delete_node, create_curve
+from ldRigNodes.utils import copy_to_clipboard, get_selected_channels, get_clipboard_text
 
 from frankenstein import RigUtils
+rig_utils = RigUtils()
 
 # Alignment Utils.
 def align_to_guids():
@@ -122,8 +124,6 @@ def auto_bone_generator():
         cmds.connectAttr(selectedObjects[target]+".worldMatrix[0]", cmds.ls(sl=True)[0] + ".offsetParentMatrix")  
 
 def tweakers_generator():
-    rigUtils = RigUtils()
-
     # TODO: Ask for the output mesh.
     baseGeometry = "headFacialBlendshapeOUT"
 
@@ -145,7 +145,7 @@ def tweakers_generator():
         cmds.parent(f'{basename}_RST', selection)
         
         # Controller.
-        rigUtils.createRigController(25)
+        rig_utils.createRigController(25)
         cmds.rename('rigObject', f'{basename}_CON')
         cmds.parent(f'{basename}_CON', f'{basename}_RST')
         cmds.setAttr(f'{basename}_CON.offsetMatrix',
@@ -193,6 +193,98 @@ def tweakers_generator():
         
         if(cmds.objExists(f'{basename}_RST')):
             cmds.connectAttr(f'{basename}_RST.worldInverseMatrix[0]', '{}.bindPreMatrix[{}]'.format(skinClusterName, str(jntID)))
+
+def create_hairs():
+    current_namespace = cmds.namespaceInfo( currentNamespace=True )
+    print(f"Working in the \"{current_namespace}\" namespace.")
+
+    cmds.namespace(relativeNames=True)
+
+    rig_objects = [
+        obj for obj in cmds.ls()\
+        if obj[0] != ":" and cmds.attributeQuery("rig_objectType", node=f"{obj}", exists=True)
+    ]
+
+    guids_objects = [ obj for obj in rig_objects if cmds.getAttr(f"{obj}.rig_objectType") == 0 ]
+
+    # TODO: Find a way to compute the desired main group number.
+    main_groups_number = 5
+
+    # MASTER GENERATION.
+    # Create the masters controllers.
+    if(False in (cmds.objExists("main_start"), cmds.objExists("main_end"))):
+        raise RuntimeError("No mains guids.")
+
+    # Delete previous generated group.
+    delete_node("main_GUID_GRP", child=True)
+
+    # Create the group to store guids for master.
+    group_obj = rig_utils.createRigObjectGroup()
+    cmds.rename(group_obj.name, "main_GUID_GRP")
+    cmds.parent("main_GUID_GRP", "guid_GRP")
+
+    # Create the twistNode (usefull to build each main_groups).
+    delete_node("main_groups_twist")
+    cmds.createNode("ldRigTwistNode", name="main_groups_twist")
+    cmds.connectAttr("main_start.matrix", "main_groups_twist.matrixAPos")
+    cmds.connectAttr("main_end.matrix", "main_groups_twist.matrixBPos")
+    cmds.setAttr("main_groups_twist.startRange", 0.0)
+    cmds.setAttr("main_groups_twist.endRange", 1.0)
+    cmds.setAttr("main_groups_twist.alignAxis", 4)
+    cmds.setAttr("main_groups_twist.twistCount", main_groups_number)
+
+    main_guids = []
+
+    for i in range(main_groups_number):
+        obj_name = f"mainGroup_{i}_GUID"
+        delete_node(obj_name)
+        
+        buffer_obj = rig_utils.createRigObjectGuid()
+        cmds.rename(buffer_obj.name, obj_name)
+        cmds.parent(obj_name, "main_GUID_GRP")
+        
+        cmds.connectAttr(f"main_groups_twist.transforms[{i}]", f"{obj_name}.offsetParentMatrix")
+        
+        cmds.setAttr(f"{obj_name}.displayLocalAxis", True)
+        
+        main_guids.append(obj_name)
+
+    # Create the main curve.
+    create_curve("main", input_guids=main_guids, IK=True, FK=True, deformerCount=3, deformerType=1, type=3, alignAxis=4)
+
+    # Updating Rig Objects.
+    rig_objects = [
+        obj for obj in cmds.ls()\
+        if obj[0] != ":" and cmds.attributeQuery("rig_objectType", node=f"{obj}", exists=True)
+    ]
+
+    # STRANDS
+    # Get strands
+    strand_objects = [obj for obj in rig_objects if "strand" in obj]
+    root_strands = [obj for obj in strand_objects if obj.split("_")[1] == "00"]
+    for strand in root_strands:
+        strand_name = strand.split("_")[0]
+        strand_elements = [obj for obj in strand_objects if strand_name in obj]
+        create_curve(strand_name, input_guids=strand_elements, IK=True, FK=True, deformerCount=3, deformerType=0, type=3, alignAxis=4)
+        
+        rig_objects = [
+            obj for obj in cmds.ls()\
+            if obj[0] != ":" and cmds.attributeQuery("rig_objectType", node=f"{obj}", exists=True)
+        ]
+
+        # Parent FK to the start main buffer.
+        cmds.parent(f"{strand_name}_FK_GRP", "main_0_BUF")
+        
+        # Parent IK controllers to corresponding main buffers.
+        ik_controllers = [obj for obj in rig_objects if strand_name in obj and "IK_CON" in obj]
+        for ik_controller in ik_controllers:
+            controller_index = int(ik_controller.split("_")[1])
+            cmds.parent(ik_controller, f"main_{controller_index}_BUF")
+        
+        delete_node(f"{strand_name}_IK_GRP", child=True)
+
+    # Reset to initial setup.
+    cmds.namespace(relativeNames=False)
 
 # Display Tools.
 def copy_display():

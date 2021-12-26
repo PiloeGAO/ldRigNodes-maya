@@ -55,15 +55,3 @@ def get_clipboard_text():
             return value
     finally:
         user32.CloseClipboard()
-
-def concatanate_list(list):
-    # This function convert data from list to maya enum style.
-    newList = ""
-    
-    for id, listItem in enumerate(list):
-        if(id != 0):
-            newList += ":"
-        
-        newList += listItem
-    
-    return newList

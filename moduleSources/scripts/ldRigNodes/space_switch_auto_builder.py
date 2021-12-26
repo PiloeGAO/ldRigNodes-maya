@@ -11,7 +11,8 @@ from posixpath import basename
 
 from maya import cmds
 
-from ldRigNodes.utils import CURRENT_INSTALL_DIR, concatanate_list
+from ldRigNodes.maya_utils import concatanate_list
+from ldRigNodes.utils import CURRENT_INSTALL_DIR
 from ldRigNodes.space_switch_manager import SpaceSwitchManager
 
 def get_autobuilder_config():
