@@ -46,6 +46,7 @@ def create_shelf():
    cmds.shelfButton(label='Switch Module Displays', command='from ldRigNodes.shelf_commands import switch_modules_displays; switch_modules_displays()', sourceType='python', annotation='', imageOverlayLabel='', image='return.png', style='iconOnly')
    
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
+
    # Attributes Management.
    cmds.shelfButton(label='Copy And Link Attributes', command='from ldRigNodes.shelf_commands import copy_and_link_attributes; copy_and_link_attributes()', sourceType='python', annotation='', image='key.png', style='iconOnly')
    cmds.shelfButton(label='Copy Attributes', command='from ldRigNodes.shelf_commands import copy_custom_attribute; copy_custom_attribute()', sourceType='python', annotation='', image='export.png', style='iconOnly')
@@ -53,8 +54,9 @@ def create_shelf():
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 
-   # Clear namespaces.
+   # Various Utils.
    cmds.shelfButton(label='Clear namespaces', command='from ldRigNodes.shelf_commands import clear_namespaces; clear_namespaces()', sourceType='python', annotation='', image='trashCanOpen.png', style='iconOnly')
+   cmds.shelfButton(label='Apply Bones for ngskintools export', command='from ldRigNodes.shelf_commands import apply_bones_from_ngexport; apply_bones_from_ngexport()', sourceType='python', annotation='', image='exitRight.png', style='iconOnly')
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 

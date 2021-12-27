@@ -5,11 +5,12 @@
     :version:   0.0.2
     :brief:     List of all functions for rigging to be stored in the shelf.
 '''
+import os
 import json
 
 from maya import cmds
 
-from ldRigNodes.maya_utils import concatanate_list, delete_node, create_curve
+from ldRigNodes.maya_utils import concatanate_list, delete_node, order_objects, create_curve
 from ldRigNodes.utils import copy_to_clipboard, get_selected_channels, get_clipboard_text
 
 from frankenstein import RigUtils
@@ -208,7 +209,7 @@ def create_hairs():
     guids_objects = [ obj for obj in rig_objects if cmds.getAttr(f"{obj}.rig_objectType") == 0 ]
 
     # TODO: Find a way to compute the desired main group number.
-    main_groups_number = 5
+    main_groups_number = 3
 
     # MASTER GENERATION.
     # Create the masters controllers.
@@ -264,7 +265,7 @@ def create_hairs():
     root_strands = [obj for obj in strand_objects if obj.split("_")[1] == "00"]
     for strand in root_strands:
         strand_name = strand.split("_")[0]
-        strand_elements = [obj for obj in strand_objects if strand_name in obj]
+        strand_elements = order_objects([obj for obj in strand_objects if strand_name in obj])
         create_curve(strand_name, input_guids=strand_elements, IK=True, FK=True, deformerCount=3, deformerType=0, type=3, alignAxis=4)
         
         rig_objects = [
@@ -276,7 +277,7 @@ def create_hairs():
         cmds.parent(f"{strand_name}_FK_GRP", "main_0_BUF")
         
         # Parent IK controllers to corresponding main buffers.
-        ik_controllers = [obj for obj in rig_objects if strand_name in obj and "IK_CON" in obj]
+        ik_controllers = order_objects([obj for obj in rig_objects if strand_name in obj and "IK_CON" in obj])
         for ik_controller in ik_controllers:
             controller_index = int(ik_controller.split("_")[1])
             cmds.parent(ik_controller, f"main_{controller_index}_BUF")
@@ -453,7 +454,7 @@ def paste_custom_attribute():
             else:
                 print("Attribute already exist")
 
-# Clear namespaces.
+# Various Utils.
 def clear_namespaces():
     """Clear all namespaces in the scene and rename objects with "_".
     By: Louis Lukasik
@@ -481,3 +482,26 @@ def clear_namespaces():
                 pass
         else:
             print(f"Failed to remove namespace {ns}")
+
+def apply_bones_from_ngexport():
+    """Apply correct bones from a ngskintools .json file.
+    """
+    directory_path = cmds.fileDialog2(fileFilter="All Files (*.*)", fileMode=3, dialogStyle=1)[0]
+
+    meshes = [obj for obj in cmds.ls() if "MSH" in obj]
+
+    for file in os.listdir(directory_path):
+        object_name = file.split(".")[0]
+        if(not object_name in meshes):
+            continue
+        
+        file_path = os.path.join(directory_path, file)
+        
+        ngskintools_layers = json.load(open(file_path))
+        
+        joints_to_add = []
+        
+        for influence in ngskintools_layers["influences"]:
+            joints_to_add.append(influence["path"].split("|")[-1])
+        
+        cmds.skinCluster(joints_to_add, object_name, name=f"{object_name}_skinCluster")

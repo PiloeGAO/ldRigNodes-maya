@@ -44,6 +44,21 @@ def delete_node(name, child=False):
         print(f"Clearing {name} (child nodes: {child}).")
         cmds.delete(name, hierarchy=hierarchy)
 
+
+def order_objects(list):
+    ordered_list = []
+    for _ in range(len(list)):
+        ordered_list.append(None)
+    
+    for element in list:
+        index = int(element.split("_")[1])
+        ordered_list[index] = element
+    
+    if(None in ordered_list):
+        raise RuntimeError("order_objects failed.")
+    
+    return ordered_list
+
 def create_curve(name, input_guids=[], IK=True, FK=True, deformerCount=10, deformerType=0, type=0, alignAxis=0):
     """Create a custom fnk_curve setup.
 
@@ -136,6 +151,7 @@ def create_curve(name, input_guids=[], IK=True, FK=True, deformerCount=10, defor
         else:
             deformer_name = f"{name}_{i}_JNT"
             deformer_object = rig_utils.createRigObjectJoint()
+            cmds.setAttr(f"{deformer_object.name}.radius", 0.1)
         
         cmds.rename(deformer_object.name, deformer_name)
         cmds.parent(deformer_name, deformer_group_name)
