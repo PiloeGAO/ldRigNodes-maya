@@ -492,31 +492,66 @@ def paste_custom_attribute():
 # Various Utils.
 def clear_namespaces():
     """Clear all namespaces in the scene and rename objects with "_".
-    By: Louis Lukasik
+    Initial work by: Louis Lukasik
     """
-    for ns in cmds.namespaceInfo(':', lon=True):
+    namespace_list = cmds.namespaceInfo(':', lon=True)
+    failed_namespaces = []
+    
+    cmds.progressWindow(
+        title="Clearing Namespaces",
+        progress=0,
+        status="",
+        isInterruptable=True
+    )
+    
+    for i, ns in enumerate(namespace_list):
+        if(cmds.progressWindow( query=True, isCancelled=True )):
+            break
+
+        base_message = f"Editing {ns}"
+
+        cmds.progressWindow(
+            edit=True,
+            progress=((i+1)/len(ns)) * 100,
+            status=(base_message)
+        )
+
         if(ns == 'shared' or ns == 'UI' or ns == "blendShapes" or type(ns) == None):
             continue
         
         namespace_list = cmds.namespaceInfo(ns, ls=True)
         if(type(namespace_list) == None): continue
 
-        print(f"Editing {ns}")
         for obj in namespace_list:
             new_name = obj.replace(':', '_')
             
             try:
                 cmds.rename(obj, new_name)
-                print(f"Renaming: {obj} > {new_name}")
+                cmds.progressWindow(
+                    edit=True,
+                    progress=((i+1)/len(ns)) * 100,
+                    status=(f"{base_message} - Renaming: {obj} > {new_name}")
+                )
             except:
                 pass
         
         try:
             cmds.namespace(rm=str(ns))
         except:
-                pass
+            pass
         else:
-            print(f"Failed to remove namespace {ns}")
+            failed_namespaces.append(ns)
+    
+    cmds.progressWindow(endProgress=1)
+
+    if(len(failed_namespaces) > 0):
+        namespace_failed_list = "\n".join(failed_namespaces)
+        cmds.confirmDialog(
+            title="Namespace Removal",
+            message=f"Failed to remove namespace:\n {namespace_failed_list}",
+            button=["Ok"],
+            defaultButton="Ok"
+        )
 
 def apply_bones_from_ngexport():
     """Apply correct bones from a ngskintools .json file.
@@ -543,7 +578,7 @@ def apply_bones_from_ngexport():
 
         cmds.progressWindow(
             edit=True,
-            progress=((i+1)/len(files)),
+            progress=((i+1)/len(files)) * 100,
             status=(f"Loading {file}")
         )
 
