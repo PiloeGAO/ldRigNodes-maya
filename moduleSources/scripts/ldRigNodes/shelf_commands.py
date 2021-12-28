@@ -125,8 +125,43 @@ def auto_bone_generator():
         cmds.connectAttr(selectedObjects[target]+".worldMatrix[0]", cmds.ls(sl=True)[0] + ".offsetParentMatrix")  
 
 def tweakers_generator():
-    # TODO: Ask for the output mesh.
-    baseGeometry = "headFacialBlendshapeOUT"
+    """Generate tweakers from selection to a mesh.
+    """
+    # Getting the base mesh input.
+    baseGeometryDialog = cmds.promptDialog(
+		title='Input Object',
+		message='Enter Name:',
+		button=['OK', 'Cancel'],
+		defaultButton='OK',
+		cancelButton='Cancel',
+		dismissString='Cancel')
+    
+    if(baseGeometryDialog != "OK"):
+        return
+
+    baseGeometry = str(cmds.promptDialog(query=True, text=True))
+
+    if(baseGeometry == "" or not cmds.objExists(baseGeometry)):
+        print("Nothing entered in the dialog, skipping execution.")
+        return
+    
+    # Get the output mesh name.
+    outputMeshDialog = cmds.promptDialog(
+		title='Ouput Object',
+		message='Enter Name:',
+		button=['OK', 'Cancel'],
+		defaultButton='OK',
+		cancelButton='Cancel',
+		dismissString='Cancel')
+    
+    if(outputMeshDialog != "OK"):
+        return
+
+    output_mesh_name = str(cmds.promptDialog(query=True, text=True))
+
+    if(output_mesh_name == ""):
+        print("Nothing entered in the dialog, skipping execution.")
+        return
 
     attachList = []
 
@@ -166,9 +201,9 @@ def tweakers_generator():
         cmds.setAttr(f'{basename}_RST.rotate', 90, 0, 0, type="double3")
 
     # Create new face.
-    cmds.polyPlane(n='headFacialTweakerOUT', sx=5, sy=5)
+    cmds.polyPlane(n=output_mesh_name, sx=5, sy=5)
 
-    cmds.connectAttr(f'{baseGeometry}.outMesh', 'headFacialTweakerOUT.inMesh', force=True)
+    cmds.connectAttr(f'{baseGeometry}.outMesh', f"{output_mesh_name}.inMesh", force=True)
 
     # Bind skin to new mesh.
     skinClusterName = "skinClusterTweakers"
@@ -178,7 +213,7 @@ def tweakers_generator():
     cmds.createNode('joint', n='tweakerGlobal_JNT')
     cmds.parent('tweakerGlobal_JNT', 'head_JNT')
 
-    cmds.select('headFacialTweakerOUT')
+    cmds.select(f"{output_mesh_name}")
     cmds.select('tweakerGlobal_JNT', add=True)
     for elem in attachList:
         cmds.select(f'{elem}_JNT', add=True)
@@ -488,9 +523,30 @@ def apply_bones_from_ngexport():
     """
     directory_path = cmds.fileDialog2(fileFilter="All Files (*.*)", fileMode=3, dialogStyle=1)[0]
 
-    meshes = [obj for obj in cmds.ls() if "MSH" in obj]
+    meshes = cmds.ls(sl=True)
 
-    for file in os.listdir(directory_path):
+    if(len(meshes) == 0):
+        meshes = [obj for obj in cmds.ls() if "MSH" in obj]
+
+    cmds.progressWindow(
+        title="Loading Bones",
+        progress=0,
+        status="",
+        isInterruptable=True
+    )
+
+    files = os.listdir(directory_path)
+
+    for i, file in enumerate(files):
+        if(cmds.progressWindow( query=True, isCancelled=True )):
+            break
+
+        cmds.progressWindow(
+            edit=True,
+            progress=((i+1)/len(files)),
+            status=(f"Loading {file}")
+        )
+
         object_name = file.split(".")[0]
         if(not object_name in meshes):
             continue
@@ -505,3 +561,5 @@ def apply_bones_from_ngexport():
             joints_to_add.append(influence["path"].split("|")[-1])
         
         cmds.skinCluster(joints_to_add, object_name, name=f"{object_name}_skinCluster")
+    
+    cmds.progressWindow(endProgress=1)
