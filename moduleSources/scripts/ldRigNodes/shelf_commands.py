@@ -598,3 +598,16 @@ def apply_bones_from_ngexport():
         cmds.skinCluster(joints_to_add, object_name, name=f"{object_name}_skinCluster")
     
     cmds.progressWindow(endProgress=1)
+
+def select_bones_from_module():
+    """Select bones from selected module.
+    """
+    to_select = []
+
+    for selection in cmds.ls(sl=True):
+        selected_module = "_".join(selection.split("_")[:-1])
+
+        to_select.extend([obj for obj in cmds.ls() if selected_module in obj and "JNT" in obj])
+
+    cmds.select(clear=True)
+    cmds.select(to_select)

@@ -57,6 +57,7 @@ def create_shelf():
    # Various Utils.
    cmds.shelfButton(label='Clear namespaces', command='from ldRigNodes.shelf_commands import clear_namespaces; clear_namespaces()', sourceType='python', annotation='', image='trashCanOpen.png', style='iconOnly')
    cmds.shelfButton(label='Apply Bones for ngskintools export', command='from ldRigNodes.shelf_commands import apply_bones_from_ngexport; apply_bones_from_ngexport()', sourceType='python', annotation='', image='exitRight.png', style='iconOnly')
+   cmds.shelfButton(label='Select Bones from module', command='from ldRigNodes.shelf_commands import select_bones_from_module; select_bones_from_module()', sourceType='python', annotation='', image='share2.png', style='iconOnly')
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 
