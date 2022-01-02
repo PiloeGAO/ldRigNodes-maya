@@ -210,11 +210,8 @@ def tweakers_generator():
 
     cmds.select( clear=True)
 
-    cmds.createNode('joint', n='tweakerGlobal_JNT')
-    cmds.parent('tweakerGlobal_JNT', 'head_JNT')
-
     cmds.select(f"{output_mesh_name}")
-    cmds.select('tweakerGlobal_JNT', add=True)
+    cmds.select('facial_global_JNT', add=True)
     for elem in attachList:
         cmds.select(f'{elem}_JNT', add=True)
 
@@ -391,7 +388,7 @@ def copy_and_link_attributes():
         attributes = cmds.listAttr(node, keyable=True)
         if(attributes != None):
             cmds.select(outNode)
-            catName = node.split(":")[0] + "_Setup"
+            catName = node
             if(not cmds.attributeQuery(catName, node=outNode, exists=True)):
                 cmds.addAttr(attributeType="enum",
                                 longName=catName,
@@ -402,7 +399,10 @@ def copy_and_link_attributes():
             
             # Get node attribute value.
             for attribute in attributes:
-                attrName =  attribute.encode('ascii','ignore')
+                if(attribute in ("Mode", "MODE")):
+                    continue
+
+                attrName =  attribute
                 attrValue = cmds.getAttr(node + "." + attribute)
                 attrType = cmds.getAttr(node + "." + attribute, type=True)
                 
@@ -410,7 +410,7 @@ def copy_and_link_attributes():
                 if(attrType == "enum"):
                     names = cmds.attributeQuery(attribute, node=node, listEnum=True )[0].split(":")
                     for name in names:
-                        enumNames.append(name.encode('ascii','ignore'))
+                        enumNames.append(name)
                 
                 # Create the attribute into the master setup.
                 if(not cmds.attributeQuery(attrName, node=outNode, exists=True)):
