@@ -30,13 +30,14 @@ def create_shelf():
    cmds.shelfButton(label='Align to GUIDs', command='from ldRigNodes.shelf_commands import align_to_guids; align_to_guids()', sourceType='python', annotation='', image='menuList.png', style='iconOnly')
    cmds.shelfButton(label='Scale Guids', command='from ldRigNodes.shelf_commands import scale_guids; scale_guids()', sourceType='python', annotation='', imageOverlayLabel='GUID', image='larger.png', style='iconAndTextHorizontal')
    cmds.shelfButton(label='Scale Controllers', command='from ldRigNodes.shelf_commands import scale_controllers; scale_controllers()', sourceType='python', annotation='', imageOverlayLabel='CTRL', image='larger.png', style='iconAndTextHorizontal')
+   cmds.shelfButton(label='Align Chain of Object', command='from ldRigNodes.shelf_commands import align_chain_objects; align_chain_objects()', sourceType='python', annotation='', image='signal3.png', style='iconOnly')
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 
    # Bones Creators.
    cmds.shelfButton(label='Auto Bones Generator', command='from ldRigNodes.shelf_commands import auto_bone_generator; auto_bone_generator()', sourceType='python', annotation='', image='contrast.png', style='iconOnly')
    cmds.shelfButton(label='Tweakers Generator', command='from ldRigNodes.shelf_commands import tweakers_generator; tweakers_generator()', sourceType='python', annotation='', imageOverlayLabel='TWEAK', image='singleplayer.png', style='iconOnly')
-   cmds.shelfButton(label='Hairs Generator', command='from ldRigNodes.shelf_commands import create_hairs; create_hairs()', sourceType='python', annotation='', imageOverlayLabel='HAIRS', image='singleplayer.png', style='iconOnly')
+   cmds.shelfButton(label='Hairs Generator', command='from ldRigNodes.shelf_commands import create_fk_hairs; create_fk_hairs()', sourceType='python', annotation='', imageOverlayLabel='HAIRS', image='singleplayer.png', style='iconOnly')
    
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
    
@@ -58,6 +59,7 @@ def create_shelf():
    cmds.shelfButton(label='Clear namespaces', command='from ldRigNodes.shelf_commands import clear_namespaces; clear_namespaces()', sourceType='python', annotation='', image='trashCanOpen.png', style='iconOnly')
    cmds.shelfButton(label='Apply Bones for ngskintools export', command='from ldRigNodes.shelf_commands import apply_bones_from_ngexport; apply_bones_from_ngexport()', sourceType='python', annotation='', image='exitRight.png', style='iconOnly')
    cmds.shelfButton(label='Select Bones from module', command='from ldRigNodes.shelf_commands import select_bones_from_module; select_bones_from_module()', sourceType='python', annotation='', image='share2.png', style='iconOnly')
+   cmds.shelfButton(label='Rename Objects', command='from ldRigNodes.shelf_commands import rename_objects; rename_objects()', sourceType='python', annotation='', image='medal2.png', style='iconOnly')
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 

@@ -7,6 +7,7 @@
 '''
 import os
 import json
+import math
 
 from maya import cmds
 
@@ -83,6 +84,65 @@ def scale_controllers():
             offsetMatrix[11] *= scaleFactor
             
             cmds.setAttr(shapes[0]+".offsetMatrix", offsetMatrix, type="matrix")
+
+def align_chain_objects():
+    """Align a chain of object by using the next as up vector and the second as target.
+    """
+    selection = cmds.ls(sl=True)
+    rig_util_sel = rig_utils.getSelectedMayaObjects()
+
+    axis_list = ["X", "Y", "Z", "-X", "-Y", "-Z"]
+
+    axis1Dialog = cmds.promptDialog(
+            title='Align Axis',
+            message='Enter Axis Name (in Uppdercase):',
+            button=['OK', 'Cancel'],
+            defaultButton='OK',
+            cancelButton='Cancel',
+            dismissString='Cancel')
+
+    if(axis1Dialog != "OK"):
+        return
+        
+    align_axis_1 = axis_list.index(str(cmds.promptDialog(query=True, text=True)))
+
+    axis2Dialog = cmds.promptDialog(
+            title='Up Vector Axis',
+            message='Enter Axis Name (in Uppdercase):',
+            button=['OK', 'Cancel'],
+            defaultButton='OK',
+            cancelButton='Cancel',
+            dismissString='Cancel')
+
+    if(axis2Dialog != "OK"):
+        return
+        
+    align_axis_2 = axis_list.index(str(cmds.promptDialog(query=True, text=True)))
+
+    for i in range(len(rig_util_sel)):
+        if(i < len(rig_util_sel)-3):
+            rig_utils.alignWithTargetAndPlane(
+                rig_util_sel[i],
+                rig_util_sel[i+1],
+                rig_util_sel[i+2],
+                alignAxis1=align_axis_1,
+                alignAxis2=align_axis_2
+            )
+            
+        elif(i == len(selection)-2):
+            rig_utils.alignWithTargetAndPlane(
+                rig_util_sel[i],
+                rig_util_sel[i+1],
+                rig_util_sel[i-1],
+                alignAxis1=align_axis_1,
+                alignAxis2=align_axis_2
+            )
+            
+        elif(i == len(rig_util_sel)-1):
+            cmds.select(clear=True)
+            cmds.select(selection[i])
+            cmds.select(selection[i-1], add=True)
+            rig_utils.matchRotation()
 
 # Bones Creators.
 def auto_bone_generator():
@@ -317,6 +377,122 @@ def create_hairs():
         delete_node(f"{strand_name}_IK_GRP", child=True)
 
     # Reset to initial setup.
+    cmds.namespace(relativeNames=False)
+
+def create_fk_hairs():
+    """Create FK hairs strand from selection.
+    """
+    # Enter inside of the namespace.
+    cmds.namespace(relativeNames=True)
+
+    # Get selection and compute the basename.
+    selection = cmds.ls(sl=True)
+    base_name_prefix = selection[0].split("_")[0]
+
+    # Create the master controller if needed.
+    master_controller_Dialog = cmds.promptDialog(
+        title='Master Controller Name',
+        message='Enter Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel')
+
+    if(master_controller_Dialog != "OK"):
+        return
+
+    master_controller_name = f"{str(cmds.promptDialog(query=True, text=True))}_CON"
+    if(not master_controller_name in cmds.ls()):
+        cmds.select(clear=True)
+        master_controller = rig_utils.createRigController(34)
+        master_controller.name = master_controller_name
+
+    # Setup vairables for building.
+    output_controller_group = f"{base_name_prefix}_CON_GRP"
+    if(not output_controller_group in cmds.ls()):
+        cmds.select(clear=True)
+        controllers_group = rig_utils.createRigObjectGroup()
+        controllers_group.name = output_controller_group
+        cmds.parent(controllers_group.name, "FK_GRP")
+
+    # Create the bones group if needed.
+    output_bone_group = f"{base_name_prefix}_JNT_GRP"
+    if(not output_bone_group in cmds.ls()):
+        cmds.select(clear=True)
+        jont_group = rig_utils.createRigObjectGroup()
+        jont_group.name = output_bone_group
+        cmds.parent(jont_group.name, "bones_GRP")
+
+    # Loop on selection and create controllers/joints.
+    out_buffers = []
+    out_controllers = []
+    for i, obj in enumerate(selection):
+        print(f"Doing {i+1}/{len(selection)}.")
+        cmds.select(clear=True)
+        # Building controllers.
+        if(i == 0):
+            controller = rig_utils.createRigController(33)
+            controller.name = f"{base_name_prefix}_{str(i).zfill(2)}_CON"
+            
+            cmds.parent(controller.name, output_controller_group)
+            
+            cmds.select(clear=True)
+            cmds.select(controller.name)
+            cmds.select(obj, add=True)
+            rig_utils.matchTransform()
+            
+            cmds.select(clear=True)
+            cmds.select(controller.name)
+            rig_utils.setNeutralPose2()
+            
+            out_controllers.append(controller.name)
+        else:
+            buffer = rig_utils.createRigObjectBuffer()
+            buffer.name = f"{base_name_prefix}_{str(i).zfill(2)}_BUF"
+            out_buffers.append(buffer.name)
+            
+            cmds.select(clear=True)
+            controller = rig_utils.createRigController(33)
+            controller.name = f"{base_name_prefix}_{str(i).zfill(2)}_CON"
+            
+            cmds.parent(controller.name, buffer.name)
+            
+            cmds.connectAttr(f"{master_controller_name}.rotate", f"{buffer.name}.rotate") 
+
+            cmds.select(clear=True)
+            cmds.select(buffer.name)
+            cmds.select(obj, add=True)
+            rig_utils.matchTransform()
+            
+            cmds.select(clear=True)
+            cmds.select(buffer.name)
+            rig_utils.setNeutralPose2()
+            
+            cmds.parent(buffer.name, out_controllers[-1])
+            
+            cmds.select(clear=True)
+            cmds.select(controller.name)
+            cmds.select(obj, add=True)
+            rig_utils.matchTransform()
+            
+            cmds.select(clear=True)
+            cmds.select(controller.name)
+            rig_utils.setNeutralPose2()
+            
+            out_controllers.append(controller.name)
+
+        # Create bones.
+        cmds.select(clear=True)
+        bone = rig_utils.createRigObjectJoint()
+        bone.name = f"{base_name_prefix}_{str(i).zfill(2)}_JNT"
+        
+        cmds.parent(bone.name, output_bone_group)
+        cmds.connectAttr(
+            f"{out_controllers[-1]}.worldMatrix",
+            f"{bone.name}.offsetParentMatrix"
+        )
+
+    # Reset namespace state.
     cmds.namespace(relativeNames=False)
 
 # Display Tools.
@@ -611,3 +787,25 @@ def select_bones_from_module():
 
     cmds.select(clear=True)
     cmds.select(to_select)
+
+def rename_objects():
+    """Rename selection with correct index.
+    """
+    selection = cmds.ls(sl=True)
+    fill_value = int(math.log10(len(selection))) + 1
+
+    nameDialog = cmds.promptDialog(
+        title='Name',
+        message='Enter Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel')
+
+    if(nameDialog != "OK"):
+        return
+    name = str(cmds.promptDialog(query=True, text=True))
+
+    for i, obj in enumerate(selection):
+        new_name = f"{name}_{str(i+1).zfill(fill_value)}"
+        cmds.rename(obj, new_name)
