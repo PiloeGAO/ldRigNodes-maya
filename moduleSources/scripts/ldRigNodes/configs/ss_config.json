@@ -64,6 +64,22 @@
                         "name": "fkHeadAttach",
                         "type": "srt",
                         "ui_name": "Parent"
+                    },
+                    {
+                        "id":1,
+                        "module": "spine",
+                        "mirrorable": false,
+                        "name": "upperBody_MIX_CON",
+                        "type": "r",
+                        "ui_name": "Parent"
+                    },
+                    {
+                        "id":1,
+                        "module": "main",
+                        "mirrorable": false,
+                        "name": "SRT_local",
+                        "type": "r",
+                        "ui_name": "Parent"
                     }
                 ]
             }
