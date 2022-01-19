@@ -185,6 +185,25 @@
         ]
     },
     {
+        "module_name": "ear",
+        "mirrorable": true,
+        "links": [
+            {
+                "element_name": "base_IK_BUF",
+                "targets": [
+                    {
+                        "id":0,
+                        "module": "head",
+                        "mirrorable": false,
+                        "name": "head_FK_CON",
+                        "type": "srt",
+                        "ui_name": "Parent"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "module_name": "clavicle",
         "mirrorable": true,
         "links": [
