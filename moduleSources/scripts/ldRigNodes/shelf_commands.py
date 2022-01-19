@@ -143,6 +143,36 @@ def align_chain_objects():
             cmds.select(selection[i])
             cmds.select(selection[i-1], add=True)
             rig_utils.matchRotation()
+    
+def align_sel_with_other_namespace():
+    """Align a selection with objects from another namespace.
+    """
+    # Get the old namespace.
+    old_namespace_dialog = cmds.promptDialog(
+        title='Old Namespace Name',
+        message='Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel'
+    )
+
+    if(old_namespace_dialog != "OK"):
+        print("Execution canceled")
+        return
+
+    old_namespace = str(cmds.promptDialog(query=True, text=True))
+
+    for item in cmds.ls(sl=True):
+        new_namespace, object = item.split(":")
+        
+        if(not cmds.objExists(f"{old_namespace}:{object}")):
+            continue
+        
+        cmds.select(clear=True)
+        cmds.select([item, f"{old_namespace}:{object}"])
+        
+        rig_utils.matchTransform()
 
 # Bones Creators.
 def auto_bone_generator():
