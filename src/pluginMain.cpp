@@ -31,6 +31,7 @@
 #include "nodesLib/ldRigSelectCasesNode.h"
 #include "nodesLib/ldRigIkPlane.h"
 #include "nodesLib/ldRigFloatSwitchNode.h"
+#include "nodesLib/ldRigBlendMatrix.h"
 
 /**
  * @brief Load the plugin in Maya.
@@ -84,6 +85,9 @@ MStatus initializePlugin(MObject obj)
     if(!status) {status.perror("registerNode"); return status;}
 
     status = plugin.registerNode("ldRigFloatSwitchNode", RigFloatSwitchNode::id, &RigFloatSwitchNode::creator, &RigFloatSwitchNode::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
+
+    status = plugin.registerNode("ldRigBlendMatrixNode", ldRigBlendMatrix::id, &ldRigBlendMatrix::creator, &ldRigBlendMatrix::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
     return status;
@@ -141,6 +145,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
 
     status = plugin.deregisterNode(RigFloatSwitchNode::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+
+    status = plugin.deregisterNode(ldRigBlendMatrix::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;

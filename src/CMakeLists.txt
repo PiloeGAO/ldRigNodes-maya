@@ -16,6 +16,7 @@ set(SOURCE_FILES
     "nodesLib/ldRigSelectCasesNode.cpp"
     "nodesLib/ldRigIkPlane.cpp"
     "nodesLib/ldRigFloatSwitchNode.cpp"
+    "nodesLib/ldRigBlendMatrix.cpp"
     "pluginMain.cpp")
 
 file(GLOB_RECURSE SRC_FILE *.h *.cpp)
