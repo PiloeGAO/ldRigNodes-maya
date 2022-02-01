@@ -71,7 +71,7 @@
                         "mirrorable": false,
                         "name": "upperBody_MIX_CON",
                         "type": "r",
-                        "ui_name": "Parent"
+                        "ui_name": "UpperBody"
                     },
                     {
                         "id":1,
@@ -79,7 +79,7 @@
                         "mirrorable": false,
                         "name": "SRT_local",
                         "type": "r",
-                        "ui_name": "Parent"
+                        "ui_name": "Local"
                     }
                 ]
             }
