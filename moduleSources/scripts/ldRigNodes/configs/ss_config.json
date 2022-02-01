@@ -471,7 +471,7 @@
                         "id":0,
                         "module": "spine",
                         "mirrorable": false,
-                        "name": "attachToHips_BUF",
+                        "name": "upperBody_MIX_CON",
                         "type": "srt",
                         "ui_name": "Parent"
                     }
@@ -484,7 +484,7 @@
                         "id":0,
                         "module": "spine",
                         "mirrorable": false,
-                        "name": "attachToHips_BUF",
+                        "name": "upperBody_MIX_CON",
                         "type": "srt",
                         "ui_name": "Hips"
                     },
@@ -505,7 +505,7 @@
                         "id":0,
                         "module": "spine",
                         "mirrorable": false,
-                        "name": "attachToHips_BUF",
+                        "name": "upperBody_MIX_CON",
                         "type": "srt",
                         "ui_name": "Hips"
                     },
