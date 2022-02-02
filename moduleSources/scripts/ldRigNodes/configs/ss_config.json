@@ -74,7 +74,7 @@
                         "ui_name": "UpperBody"
                     },
                     {
-                        "id":1,
+                        "id":2,
                         "module": "main",
                         "mirrorable": false,
                         "name": "SRT_local",

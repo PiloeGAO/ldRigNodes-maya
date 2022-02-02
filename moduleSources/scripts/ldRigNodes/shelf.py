@@ -32,6 +32,7 @@ def create_shelf():
    cmds.shelfButton(label='Scale Controllers', command='from ldRigNodes.shelf_commands import scale_controllers; scale_controllers()', sourceType='python', annotation='', imageOverlayLabel='CTRL', image='larger.png', style='iconAndTextHorizontal')
    cmds.shelfButton(label='Align Chain of Object', command='from ldRigNodes.shelf_commands import align_chain_objects; align_chain_objects()', sourceType='python', annotation='', image='signal3.png', style='iconOnly')
    cmds.shelfButton(label='Align Selection With Other Namespace', command='from ldRigNodes.shelf_commands import align_sel_with_other_namespace; align_sel_with_other_namespace()', sourceType='python', annotation='', image='multiplayer.png', style='iconOnly')
+   cmds.shelfButton(label='Change Rotate Order', command='from ldRigNodes.shelf_commands import updateRotateOrderSelection; updateRotateOrderSelection()', sourceType='python', annotation='', image='fightJoy_25.png', style='iconOnly')
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 

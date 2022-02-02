@@ -119,6 +119,7 @@ def autobuild_hierarchy():
                 cmds.connectAttr(f"{base_name}_setup.spaceSwitches_{link['element_name']}", f"{float_switch_node}.caseID")
 
                 for index, name in enumerate(space_switches_names):
+                    if(index == 0): continue
                     cmds.connectAttr(f"{float_switch_node}.outputValues[{index}]", f"spaceSwitch_{object_name}.spaces[{index}].weight")
 
 

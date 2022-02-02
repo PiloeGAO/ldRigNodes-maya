@@ -174,6 +174,37 @@ def align_sel_with_other_namespace():
         
         rig_utils.matchTransform()
 
+def updateRotateOrderSelection():
+    """Update the rotation order for selection.
+    """
+    orders = [
+        "XYZ",
+        "YZX",
+        "ZXY",
+        "XZY",
+        "YXZ",
+        "ZYX"
+    ]
+
+    def updateRotateOrder(item):
+        """Apply rotation order to each objects.
+
+        Args:
+            item (str): Item of the `orders` list.
+        """
+        order_id = orders.index(item)
+        
+        for sel in cmds.ls(sl=True):
+            cmds.setAttr(f"{sel}.rotateOrder", order_id)
+
+    window = cmds.window(title="Rotate Order Updater")
+    cmds.columnLayout(adjustableColumn=True)
+    cmds.optionMenu(label="Rotate Order", changeCommand=updateRotateOrder)
+    for order in orders:
+        cmds.menuItem( label=order)
+        
+    cmds.showWindow(window)
+
 # Bones Creators.
 def auto_bone_generator():
     """Create joint from selection.
