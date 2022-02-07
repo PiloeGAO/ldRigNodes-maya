@@ -14,7 +14,7 @@ from maya import cmds
 from ldRigNodes.maya_utils import concatanate_list, delete_node, order_objects, create_curve
 from ldRigNodes.utils import copy_to_clipboard, get_selected_channels, get_clipboard_text
 
-from frankenstein import RigUtils
+from frankenstein import RigUtils, RigCurve, RigAxis
 rig_utils = RigUtils()
 
 # Alignment Utils.
@@ -554,6 +554,117 @@ def create_fk_hairs():
         )
 
     # Reset namespace state.
+    cmds.namespace(relativeNames=False)
+
+# Facial Tools.
+def createMidBuffer():
+    """Create a buffer at mid distance between 2 selected objects.
+    """
+    cmds.namespace(relativeNames=True)
+    
+    # Get the name of the buffer object.
+    new_name_dialog = cmds.promptDialog(
+        title='Buffer Name',
+        message='Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel'
+    )
+
+    if(new_name_dialog != "OK"):
+        print("Execution canceled")
+        pass
+
+    buffer_node = str(cmds.promptDialog(query=True, text=True))
+
+
+    sel = rig_utils.getSelectedMayaObjects()
+
+    if(len(sel) != 2):
+        print("Selection invalid")
+        pass
+
+
+    blend_matrix_node_name = f"{buffer_node}_blendmatrix"
+    cmds.createNode("ldRigBlendMatrixNode", name=blend_matrix_node_name)
+
+    buffer_obj = rig_utils.createRigObjectBuffer()
+    buffer_obj.name = buffer_node
+
+    cmds.connectAttr(f"{sel[0].name}.worldMatrix[0]", f"{blend_matrix_node_name}.tranformA")
+    cmds.connectAttr(f"{sel[1].name}.worldMatrix[0]", f"{blend_matrix_node_name}.tranformB")
+    cmds.setAttr(f"{blend_matrix_node_name}.blendFactor", 0.5)
+    cmds.connectAttr(f"{blend_matrix_node_name}.outTranform", f"{buffer_obj.name}.offsetParentMatrix")
+
+    cmds.namespace(relativeNames=False)
+
+def createFacialCurve():
+    """Create curve from selection pre-setuped for facial rigging.
+    """
+    cmds.namespace(relativeNames=True)
+
+    # Get the name of the curve.
+    base_name_dialog = cmds.promptDialog(
+        title='Curve Name',
+        message='Name:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel'
+    )
+
+    if(base_name_dialog  != "OK"):
+        print("Execution canceled")
+        return
+
+    base_name = str(cmds.promptDialog(query=True, text=True))
+
+    # Get the Axis.
+    Axises = {
+        "+X":  RigAxis.PlusAxisX,
+        "+Y":  RigAxis.PlusAxisY,
+        "+Z":  RigAxis.PlusAxisZ,
+        "-X": RigAxis.MinusAxisX,
+        "-Y": RigAxis.MinusAxisY,
+        "-Z": RigAxis.MinusAxisZ
+    }
+
+    axis_dialog = cmds.promptDialog(
+        title='Axis',
+        message='Axis:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel'
+    )
+
+    if(axis_dialog  != "OK"):
+        print("Execution canceled")
+        return
+
+    curve_axis = Axises[str(cmds.promptDialog(query=True, text=True))]
+    
+    # Get the number of bones.
+    deformers_number_dialog = cmds.promptDialog(
+        title='Deformer Number',
+        message='Number:',
+        button=['OK', 'Cancel'],
+        defaultButton='OK',
+        cancelButton='Cancel',
+        dismissString='Cancel'
+    )
+
+    if(deformers_number_dialog != "OK"):
+        print("Execution canceled")
+        return
+
+    deformers_number = int(cmds.promptDialog(query=True, text=True))
+
+    curve = RigCurve.createIkCatmullRomCurve(deformerCount=deformers_number, alignAxis=curve_axis, deformerBaseName=base_name, deformerSize=0.1)
+
+    curve.name = f"{base_name}_curve"
+
     cmds.namespace(relativeNames=False)
 
 # Display Tools.

@@ -42,6 +42,12 @@ def create_shelf():
    cmds.shelfButton(label='Hairs Generator', command='from ldRigNodes.shelf_commands import create_fk_hairs; create_fk_hairs()', sourceType='python', annotation='', imageOverlayLabel='HAIRS', image='singleplayer.png', style='iconOnly')
    
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
+
+   # Facial Tools.
+   cmds.shelfButton(label='Mid Buffer Creator', command='from ldRigNodes.shelf_commands import createMidBuffer; createMidBuffer()', sourceType='python', annotation='', imageOverlayLabel='BUF', image='barsHorizontal.png', style='iconOnly')
+   cmds.shelfButton(label='Facial Curve Creator', command='from ldRigNodes.shelf_commands import createFacialCurve; createFacialCurve()', sourceType='python', annotation='', imageOverlayLabel='CURVE', image='singleplayer.png', style='iconOnly')
+   
+   cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
    
    # Display Tools.
    cmds.shelfButton(label='Copy Display', command='from ldRigNodes.shelf_commands import copy_display; copy_display()', sourceType='python', annotation='', imageOverlayLabel='DISPL', image='export.png', style='iconOnly')
