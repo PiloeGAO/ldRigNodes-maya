@@ -8,7 +8,7 @@
 from maya import cmds
 
 def init_plugin():
-    print("Loading ldRigNodes")
+    print("Loading ldRigNodes 0.0.2")
     
     # Load the ldRigNodes plugin.
     cmds.loadPlugin('ldRigNodes')
