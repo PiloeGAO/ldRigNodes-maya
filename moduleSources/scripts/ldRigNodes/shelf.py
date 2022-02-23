@@ -8,7 +8,7 @@
 import maya.cmds as cmds
 import maya
 
-# from ldRigNodes.space_switch_auto_builder import get_autobuilder_config
+from ldRigNodes.space_switch_auto_builder import get_autobuilder_config
 
 def remove_shelf():
    if cmds.shelfLayout('ldRigNodes', exists=True):
