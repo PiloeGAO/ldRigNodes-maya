@@ -245,6 +245,29 @@ def auto_bone_generator():
         # Connect it to controller
         cmds.connectAttr(selectedObjects[target]+".worldMatrix[0]", cmds.ls(sl=True)[0] + ".offsetParentMatrix")  
 
+def child_bones_from_selection():
+    """Create a bones from 
+    """
+    for target in cmds.ls(sl=True):
+        cmds.select( clear=True )
+        cmds.select( target )
+        
+        # Create a joint
+        cmds.joint()
+            
+        # Set name, radius, joint orient and position.
+        cmds.rename(target[:-4] + "_JNT")
+        
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".radius", 0.1)
+        
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".translateX", 0)
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".translateY", 0)
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".translateZ", 0)
+        
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".jointOrientX", 0)
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".jointOrientY", 0)
+        cmds.setAttr(cmds.ls(sl=True)[0] + ".jointOrientZ", 0)
+
 def tweakers_generator():
     """Generate tweakers from selection to a mesh.
     """
