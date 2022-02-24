@@ -32,7 +32,8 @@ class SpaceSwitchManagerUI(QWidget,Ui_space_switch_main):
         
         #Parent widget under Maya main window        
         self.setParent(mayaMainWindow)
-        self.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.Window | Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
+        self.setFixedSize(143, 166)
 
         self.setupUi(self)
         self.link_UI()
