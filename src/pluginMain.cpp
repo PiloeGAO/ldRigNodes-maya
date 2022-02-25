@@ -32,6 +32,7 @@
 #include "nodesLib/ldRigIkPlane.h"
 #include "nodesLib/ldRigFloatSwitchNode.h"
 #include "nodesLib/ldRigBlendMatrix.h"
+#include "nodesLib/ldRigEyelidNode.h"
 
 /**
  * @brief Load the plugin in Maya.
@@ -88,6 +89,9 @@ MStatus initializePlugin(MObject obj)
     if(!status) {status.perror("registerNode"); return status;}
 
     status = plugin.registerNode("ldRigBlendMatrixNode", ldRigBlendMatrix::id, &ldRigBlendMatrix::creator, &ldRigBlendMatrix::initialize);
+    if(!status) {status.perror("registerNode"); return status;}
+
+    status = plugin.registerNode("ldRigEyelidNode", ldRigEyelidNode::id, &ldRigEyelidNode::creator, &ldRigEyelidNode::initialize);
     if(!status) {status.perror("registerNode"); return status;}
 
     return status;
@@ -148,6 +152,9 @@ MStatus uninitializePlugin(MObject obj)
     if(!status) {status.perror("deregisterNode"); return status;}
 
     status = plugin.deregisterNode(ldRigBlendMatrix::id);
+    if(!status) {status.perror("deregisterNode"); return status;}
+
+    status = plugin.deregisterNode(ldRigEyelidNode::id);
     if(!status) {status.perror("deregisterNode"); return status;}
 
     return status;
