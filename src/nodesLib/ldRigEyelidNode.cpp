@@ -47,7 +47,7 @@ MObject ldRigEyelidNode::outBottomMiddle;
 MObject ldRigEyelidNode::outBottomOuter;
 
 /**
- * @brief Compute the blend between matrix A and matrix B.
+ * @brief Compute the value of each group for eyelids.
  * 
  * @param plug 
  * @param data 
@@ -76,20 +76,26 @@ MStatus ldRigEyelidNode::compute(const MPlug& plug, MDataBlock& data)
         double bottomInnerIntensity = getFloat(data, inBottomInner);
         double bottomMiddleIntensity = getFloat(data, inBottomMiddle);
         double bottomOuterIntensity = getFloat(data, inBottomOuter);
+
+        double topIntensityMultiplier = masterRotation * topIntensity;
+        double bottomIntensityMultiplier = -1.0 * masterRotation * bottomIntensity;
+
+        double topIntensityValue = topIntensityMultiplier + topRotation;
+        double bottomIntensityValue = bottomIntensityMultiplier + bottomRotation;
         
         /* Set the result floats as output. */
         MDataHandle topInnerHandle = data.outputValue(outTopInner);
-        topInnerHandle.setFloat(0.5);
+        topInnerHandle.setFloat(topInnerIntensity * topIntensityValue);
         MDataHandle topMiddleHandle = data.outputValue(outTopMiddle);
-        topMiddleHandle.setFloat(0.5);
+        topMiddleHandle.setFloat(topMiddleIntensity * topIntensityValue);
         MDataHandle topOuterHandle = data.outputValue(outTopOuter);
-        topOuterHandle.setFloat(0.5);
+        topOuterHandle.setFloat(topOuterIntensity * topIntensityValue);
         MDataHandle bottomInnerHandle = data.outputValue(outBottomInner);
-        bottomInnerHandle.setFloat(0.5);
+        bottomInnerHandle.setFloat(bottomInnerIntensity * bottomIntensityValue);
         MDataHandle bottomMiddleHandle = data.outputValue(outBottomMiddle);
-        bottomMiddleHandle.setFloat(0.5);
+        bottomMiddleHandle.setFloat(bottomMiddleIntensity * bottomIntensityValue);
         MDataHandle bottomOuterHandle = data.outputValue(outBottomOuter);
-        bottomOuterHandle.setFloat(0.5);
+        bottomOuterHandle.setFloat(bottomOuterIntensity * bottomIntensityValue);
         data.setClean(plug);
     } else {
         return MS::kUnknownParameter;
