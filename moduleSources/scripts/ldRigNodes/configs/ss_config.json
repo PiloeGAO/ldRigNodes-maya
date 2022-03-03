@@ -90,7 +90,7 @@
         "mirrorable": false,
         "links": [
             {
-                "element_name": "jaw_BUF",
+                "element_name": "attachJaw_BUF",
                 "targets": [
                     {
                         "id":0,
@@ -103,7 +103,7 @@
                 ]
             },
             {
-                "element_name": "head_BUF",
+                "element_name": "attachHead_BUF",
                 "targets": [
                     {
                         "id":0,
