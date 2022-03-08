@@ -20,9 +20,7 @@ set(SOURCE_FILES
     "nodesLib/ldRigEyelidNode.cpp"
     "pluginMain.cpp")
 
-file(GLOB_RECURSE SRC_FILE *.h *.cpp)
-
-MESSAGE(STATUS "SourceFile" ${SRC_FILE})
+MESSAGE(STATUS "SourceFile" ${SOURCE_FILES})
 
 find_package(Maya REQUIRED)
 

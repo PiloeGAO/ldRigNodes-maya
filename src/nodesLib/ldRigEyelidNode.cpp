@@ -132,28 +132,28 @@ MStatus ldRigEyelidNode::initialize()
     inBottomRotation = addInputFloatAttribute(stat, MString("bottomRotation"), MString("bottomRot"), 0.0, -360, 360);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inTopIntensity = addInputFloatAttribute(stat, MString("topIntensity"), MString("topInt"), 1.0, 0.0, 1.0);
+    inTopIntensity = addInputFloatAttribute(stat, MString("topIntensity"), MString("topInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inBottomIntensity = addInputFloatAttribute(stat, MString("bottomIntensity"), MString("bottomInt"), 1.0, 0.0, 1.0);
+    inBottomIntensity = addInputFloatAttribute(stat, MString("bottomIntensity"), MString("bottomInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inTopInner = addInputFloatAttribute(stat, MString("topInnerIntensity"), MString("topInnerInt"), 1.0, 0.0, 1.0);
+    inTopInner = addInputFloatAttribute(stat, MString("topInnerIntensity"), MString("topInnerInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inTopMiddle = addInputFloatAttribute(stat, MString("topMiddleIntensity"), MString("topMiddleInt"), 1.0, 0.0, 1.0);
+    inTopMiddle = addInputFloatAttribute(stat, MString("topMiddleIntensity"), MString("topMiddleInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inTopOuter = addInputFloatAttribute(stat, MString("topOuterIntensity"), MString("topOuterInt"), 1.0, 0.0, 1.0);
+    inTopOuter = addInputFloatAttribute(stat, MString("topOuterIntensity"), MString("topOuterInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inBottomInner = addInputFloatAttribute(stat, MString("bottomInnerIntensity"), MString("bottomInnerInt"), 1.0, 0.0, 1.0);
+    inBottomInner = addInputFloatAttribute(stat, MString("bottomInnerIntensity"), MString("bottomInnerInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inBottomMiddle = addInputFloatAttribute(stat, MString("bottomMiddleIntensity"), MString("bottomMiddleInt"), 1.0, 0.0, 1.0);
+    inBottomMiddle = addInputFloatAttribute(stat, MString("bottomMiddleIntensity"), MString("bottomMiddleInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
-    inBottomOuter = addInputFloatAttribute(stat, MString("bottomOuterIntensity"), MString("bottomOuterInt"), 1.0, 0.0, 1.0);
+    inBottomOuter = addInputFloatAttribute(stat, MString("bottomOuterIntensity"), MString("bottomOuterInt"), 1.0, 0.0, 2.0);
     if(!stat) {stat.perror("addAttribute"); return stat;}
 
     outTopInner = addOutputFloatAttribute(stat, MString("topInnerRotation"), MString("topInnerRot"));
