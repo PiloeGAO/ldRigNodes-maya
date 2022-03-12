@@ -1004,3 +1004,24 @@ def rename_objects():
     for i, obj in enumerate(selection):
         new_name = f"{name}_{str(i+1).zfill(fill_value)}"
         cmds.rename(obj, new_name)
+    
+def get_distance():
+    """Get distance between 2 objects.
+    """
+    selection = cmds.ls(sl=True)
+    if(len(selection) != 2):
+        print("Please select 2 objects.")
+        return
+    
+    object_1_matrix = cmds.getAttr(f"{selection[0]}.worldMatrix")
+    object_2_matrix = cmds.getAttr(f"{selection[1]}.worldMatrix")
+
+    object_1_pos = [object_1_matrix[12], object_1_matrix[13], object_1_matrix[14]]
+    object_2_pos = [object_2_matrix[12], object_2_matrix[13], object_2_matrix[14]]
+
+    distance = abs(math.sqrt((object_2_pos[0] - object_1_pos[0]) ** 2\
+        + (object_2_pos[1] - object_1_pos[1]) ** 2\
+        + (object_2_pos[2] - object_1_pos[2]) ** 2))
+
+    copy_to_clipboard(str(distance).encode())
+    print(f"Distance: {distance}")

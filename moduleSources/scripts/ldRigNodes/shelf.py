@@ -69,6 +69,7 @@ def create_shelf():
    cmds.shelfButton(label='Apply Bones for ngskintools export', command='from ldRigNodes.shelf_commands import apply_bones_from_ngexport; apply_bones_from_ngexport()', sourceType='python', annotation='', image='ApplyBonesFromNGSKinTools18.png', style='iconOnly')
    cmds.shelfButton(label='Select Bones from module', command='from ldRigNodes.shelf_commands import select_bones_from_module; select_bones_from_module()', sourceType='python', annotation='', image='SelectBonesForModule19.png', style='iconOnly')
    cmds.shelfButton(label='Rename Objects', command='from ldRigNodes.shelf_commands import rename_objects; rename_objects()', sourceType='python', annotation='', image='RenameObjects20.png', style='iconOnly')
+   cmds.shelfButton(label='Get Distance', command='from ldRigNodes.shelf_commands import get_distance; get_distance()', sourceType='python', annotation='', image='GetDistance24.png', style='iconOnly')
 
    cmds.separator(width=12,height=35, style=shelfStyle, hr=False)
 
