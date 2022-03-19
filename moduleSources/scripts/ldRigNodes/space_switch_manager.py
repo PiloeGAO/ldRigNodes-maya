@@ -143,7 +143,7 @@ class SpaceSwitchManager():
             return spaceNodes
         return None
 
-    def add_space(self, space_object, space_type):
+    def add_space(self, space_object, space_type, weight=1.0):
 
         nodeTransform   = OpenMaya.MMatrix(cmds.xform(self._nodeName, q=True, ws=True, matrix=True))
         spaceTransform  = OpenMaya.MMatrix(cmds.xform(space_object, q=True, ws=True, matrix=True))
@@ -157,10 +157,14 @@ class SpaceSwitchManager():
         index   = 0
         if(spaces):
             index = len(spaces)
+        
+        if(weight > 1.0): weight = 1.0
+        elif(weight < 0.0): weight = 0.0
 
         cmds.setAttr('%s.spaces[%d].offset' % (node, index), offsetMatrix, type='matrix')
         cmds.connectAttr('%s.worldMatrix[0]' % space_object, '%s.spaces[%d].matrix' % (node, index))
         cmds.setAttr('%s.spaces[%d].type' % (node, index), space_type)
+        cmds.setAttr('%s.spaces[%d].weight' % (node, index), weight)
         cmds.xform(self._nodeName, matrix=OpenMaya.MMatrix.kIdentity, ws=False)
 
     def remove_space(self, space_object):

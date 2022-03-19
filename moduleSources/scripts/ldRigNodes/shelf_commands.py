@@ -1025,3 +1025,16 @@ def get_distance():
 
     copy_to_clipboard(str(distance).encode())
     print(f"Distance: {distance}")
+
+def reset_offsetParentMatrix():
+    """Reset the matrix stored in the offsetParentMatrix.
+    """
+    for sel in cmds.ls(sl=True):
+        reset_matrix = (
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        )
+        
+        cmds.setAttr(f"{sel}.offsetParentMatrix", reset_matrix, type="matrix")
