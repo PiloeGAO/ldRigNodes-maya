@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.19)
+project(ldRigNodes)
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/install)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
+set(INSTALL_PATH ${CMAKE_CURRENT_BINARY_DIR}/install)
+
+add_subdirectory(src)
+message( "SOURCE_DIR: " ${CMAKE_CURRENT_SOURCE_DIR} )
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/moduleSources/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/install/${CMAKE_PROJECT_NAME}/)

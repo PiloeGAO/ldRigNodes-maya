@@ -17,7 +17,7 @@
 *.dll
 
 # Fortran module files
-*.mod
+#*.mod
 *.smod
 
 # Compiled Static libraries
@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Build directories
+build/
+
+# Documentation directory
+moduleSources/doc/
+
+# Code editor settings
+.vscode/

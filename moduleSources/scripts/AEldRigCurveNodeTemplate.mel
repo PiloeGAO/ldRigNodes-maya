@@ -1,0 +1,108 @@
+// Original file from Guillaume Baratte.
+global proc AEldRigCurveNodeTemplate( string $nodeName )
+{
+// Add the Scroll Layout.
+    editorTemplate -beginScrollLayout;
+
+        // Add the curve options Layout.
+        editorTemplate -beginLayout "Curve Options" -collapse 0;
+
+            editorTemplate -label "Deformer Count" -addControl "deformerCount";
+            editorTemplate -label "Curve Rest Length" -addControl "curveRestLength";
+            editorTemplate -label "Controllers Rest Distance" -addControl "contollersRestDistance";
+            editorTemplate -label "Fk Ik Blend" -addControl "fkIkBlend";
+            editorTemplate -label "Stretchable" -addControl "stretchable";
+            editorTemplate -label "Limit Stretch" -addControl "limitStretch";
+            editorTemplate -label "Tangent Mode" -addControl "tangentMode";
+            editorTemplate -label "Scale Mode" -addControl "scaleMode";
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "Distribution" -collapse 1;
+
+            editorTemplate -label "Distribution Mode" -addControl "distributionMode";
+            editorTemplate -label "Distribution Start" -addControl "distributionStart";
+            editorTemplate -label "Distribution End" -addControl "distributionEnd";
+            editorTemplate -label "Distribution Move" -addControl "distributionMove";
+            AEaddRampControl($nodeName+".distributionProfil");
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "Twist" -collapse 1;
+
+            editorTemplate -label "Twist Mode" -addControl "twistMode";
+            editorTemplate -label "Twist Align Axis" -addControl "twistAlignAxis";
+            AEaddRampControl($nodeName+".twistProfil");
+
+        editorTemplate -endLayout;
+
+        editorTemplate -beginLayout "Stretch And Squatch" -collapse 1;
+
+            editorTemplate -label "Stretch N Squatch Mode" -addControl "stretchSquatchMode";
+
+            editorTemplate -beginLayout "Stretch" -collapse 1;
+                editorTemplate -label "Scale Length" -addControl "stretchLengthFactor";
+                editorTemplate -label "Axis 0 Scale" -addControl "stretchAxis0Scale";
+                editorTemplate -label "Axis 1 Scale" -addControl "stretchAxis1Scale";
+                AEaddRampControl($nodeName+".stretchProfil");
+
+            editorTemplate -endLayout;
+
+            editorTemplate -beginLayout "Squatch" -collapse 1;
+                editorTemplate -label "Scale Length" -addControl "squatchLengthFactor";
+                editorTemplate -label "Axis 0 Scale" -addControl "squatchAxis0Scale";
+                editorTemplate -label "Axis 1 Scale" -addControl "squatchAxis1Scale";
+                AEaddRampControl($nodeName+".squatchProfil");
+
+            editorTemplate -endLayout;
+
+        editorTemplate -endLayout;
+
+    // Add the maya extra controls layout.
+    editorTemplate -addExtraControls;
+    editorTemplate -endScrollLayout;
+
+    // Set Distribution Profil ramp.
+    setAttr( $nodeName+".distributionProfil[0].distributionProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".distributionProfil[0].distributionProfil_Position") 0.0;
+    setAttr( $nodeName+".distributionProfil[0].distributionProfil_Interp") 1;
+
+    setAttr( $nodeName+".distributionProfil[1].distributionProfil_FloatValue") 1.0;
+    setAttr( $nodeName+".distributionProfil[1].distributionProfil_Position") 1.0;
+    setAttr( $nodeName+".distributionProfil[1].distributionProfil_Interp") 1;
+
+    // Set twist Profil ramp.
+    setAttr( $nodeName+".twistProfil[0].twistProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".twistProfil[0].twistProfil_Position") 0.0;
+    setAttr( $nodeName+".twistProfil[0].twistProfil_Interp") 1;
+
+    setAttr( $nodeName+".twistProfil[1].twistProfil_FloatValue") 1.0;
+    setAttr( $nodeName+".twistProfil[1].twistProfil_Position") 1.0;
+    setAttr( $nodeName+".twistProfil[1].twistProfil_Interp") 1;
+
+    // Set Stretch Profil ramp.
+    setAttr( $nodeName+".stretchProfil[0].stretchProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".stretchProfil[0].stretchProfil_Position") 0.0;
+    setAttr( $nodeName+".stretchProfil[0].stretchProfil_Interp") 2;
+
+    setAttr( $nodeName+".stretchProfil[1].stretchProfil_FloatValue") 1.0;
+    setAttr( $nodeName+".stretchProfil[1].stretchProfil_Position") 0.5;
+    setAttr( $nodeName+".stretchProfil[1].stretchProfil_Interp") 2;
+
+    setAttr( $nodeName+".stretchProfil[2].stretchProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".stretchProfil[2].stretchProfil_Position") 1.0;
+    setAttr( $nodeName+".stretchProfil[2].stretchProfil_Interp") 2;
+
+    // Set Squatch Profil ramp.
+    setAttr( $nodeName+".squatchProfil[0].squatchProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".squatchProfil[0].squatchProfil_Position") 0.0;
+    setAttr( $nodeName+".squatchProfil[0].squatchProfil_Interp") 2;
+
+    setAttr( $nodeName+".squatchProfil[1].squatchProfil_FloatValue") 1.0;
+    setAttr( $nodeName+".squatchProfil[1].squatchProfil_Position") 0.5;
+    setAttr( $nodeName+".squatchProfil[1].squatchProfil_Interp") 2;
+
+    setAttr( $nodeName+".squatchProfil[2].squatchProfil_FloatValue") 0.0;
+    setAttr( $nodeName+".squatchProfil[2].squatchProfil_Position") 1.0;
+    setAttr( $nodeName+".squatchProfil[2].squatchProfil_Interp") 2;
+}
